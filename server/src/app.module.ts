@@ -1,38 +1,38 @@
-import { GraphQLModule } from '@nestjs/graphql';
-import { Logger, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from 'nestjs-prisma';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AppResolver } from './app.resolver';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
-import { PostsModule } from 'src/posts/posts.module';
-import config from 'src/common/configs/config';
-import { loggingMiddleware } from 'src/common/middleware/logging.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { GqlConfigService } from './gql-config.service';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import * as Joi from 'joi';
+import { AuthModule } from './auth/auth.module';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
-    PrismaModule.forRoot({
+    AuthModule,
+    ConfigModule.forRoot({
       isGlobal: true,
-      prismaServiceOptions: {
-        middlewares: [loggingMiddleware(new Logger('PrismaMiddleware'))], // configure your prisma middleware
+      validationSchema: Joi.object({
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION: Joi.string().required(),
+        PORT: Joi.number().required(),
+      }),
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault],
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }),
+      cors: {
+        credentials: true,
+        origin: true,
       },
     }),
-
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      useClass: GqlConfigService,
-    }),
-
-    AuthModule,
-    UsersModule,
-    PostsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppResolver],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
