@@ -11,22 +11,21 @@ datasource db {
 }
 
 model User {
-  budgets Budget[]
-
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
+  id         String     @id @default(uuid())
+  email      String     @unique
+  password   String
+  budgets    Budget[]
+  categories Category[]
 }
 
 model Budget {
-  budgetItems BudgetItem[]
-  user        User?        @relation(fields: [userId], references: [id])
-  userId      String?
-
-  id          String  @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
-  amount      Int
+  amount      Int          @default(0)
+  budgetItems BudgetItem[]
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -39,11 +38,21 @@ model BudgetItem {
   id       String    @id @default(uuid())
   name     String
   amount   Int
-  dueDate  DateTime
+  dueDate  DateTime?
   paidDate DateTime?
   paid     Boolean   @default(false)
   note     String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now())
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+}
+
+model Category {
+  id         String       @id @default(uuid())
+  name       String
+  budgetItem BudgetItem[]
+  User       User         @relation(fields: [userId], references: [id])
+  userId     String
 }

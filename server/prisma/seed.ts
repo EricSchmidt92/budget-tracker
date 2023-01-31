@@ -1,18 +1,41 @@
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.budgetItem.deleteMany();
+  await prisma.category.deleteMany();
   await prisma.budget.deleteMany();
   await prisma.user.deleteMany();
 
   console.log('Seeding...');
 
-  const user1 = await prisma.user.create({
+  const userId = randomUUID();
+
+  const userBase = await prisma.user.create({
     data: {
+      id: userId,
       email: 'b@b.comx',
       password: '$2b$10$hfNOkHYE3cyetoui0HXMN.ukzAUt4WfdA8lpq7WK1Yjze/adNVb2m', // b
+    },
+  });
+
+  const foodCategory = await prisma.category.create({
+    data: {
+      name: 'food',
+      userId: userId,
+    },
+  });
+
+  const cosmeticsCategory = await prisma.category.create({
+    data: {
+      name: 'cosmetics',
+      userId: userId,
+    },
+  });
+  const updatedUser = await prisma.user.update({
+    data: {
       budgets: {
         create: {
           name: 'Food Expenses',
@@ -28,6 +51,11 @@ async function main() {
                 paidDate: new Date(),
                 paid: true,
                 note: 'This is for our veggies',
+                category: {
+                  connect: {
+                    id: foodCategory.id,
+                  },
+                },
               },
               {
                 name: 'Meat',
@@ -36,22 +64,36 @@ async function main() {
                 paidDate: new Date(),
                 paid: true,
                 note: 'This is for our meat spending',
+                category: {
+                  connect: {
+                    id: foodCategory.id,
+                  },
+                },
               },
+
               {
                 name: 'Makeup',
                 amount: 300,
                 dueDate: new Date(),
                 paidDate: new Date(),
                 paid: true,
+                category: {
+                  connect: {
+                    id: cosmeticsCategory.id,
+                  },
+                },
               },
             ],
           },
         },
       },
     },
+    where: {
+      id: userId,
+    },
   });
 
-  console.log('seeded user1: ', user1);
+  console.log('seeded user1: ', updatedUser);
 }
 
 main()
