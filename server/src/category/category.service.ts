@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
@@ -23,19 +29,93 @@ export class CategoryService {
       },
       select: {
         name: true,
+        id: true,
       },
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(userId: string, categoryId: string) {
+    const { categories } = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        categories: {
+          where: { id: categoryId },
+        },
+      },
+    });
+
+    if (categories.length < 1) {
+      throw new NotFoundException();
+    }
+
+    return categories[0];
   }
 
-  update(id: string, updateCategoryInput: UpdateCategoryInput) {
-    return `This action updates a #${id} category`;
+  async update(
+    userId: string,
+    { id, ...data }: UpdateCategoryInput
+  ): Promise<Category> {
+    const { categories } = await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        categories: {
+          update: {
+            where: { id },
+            data,
+          },
+        },
+      },
+      include: {
+        categories: {
+          where: { id },
+        },
+      },
+    });
+
+    if (categories.length < 1) {
+      throw new NotFoundException();
+    }
+
+    const updatedCategory = categories[0];
+
+    return { id: updatedCategory.id, name: updatedCategory.name };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove({ userId, categoryId }: { userId: string; categoryId: string }) {
+    let categories: Category[];
+
+    try {
+      const updatedUser = await this.prismaService.user.update({
+        where: { id: userId },
+        data: {
+          categories: {
+            delete: {
+              id: categoryId,
+            },
+          },
+        },
+        include: {
+          categories: {
+            where: { id: categoryId },
+          },
+        },
+      });
+
+      categories = updatedUser.categories;
+    } catch (error) {
+      console.error(error);
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2017'
+      ) {
+        console.error(error.message);
+        throw new BadRequestException(
+          'The categoryId does not seem to be valid'
+        );
+      }
+      return false;
+    }
+
+    return categories.length === 0;
   }
 }

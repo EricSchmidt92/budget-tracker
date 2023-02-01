@@ -1,13 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
+import { User } from 'src/auth/users/models/user.model';
 import { CategoryService } from './category.service';
-import { Category } from './entities/category.entity';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
-import { Request } from 'express';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'src/auth/users/models/user.model';
+import { Category } from './entities/category.entity';
 
 @UseGuards(GqlAuthGuard)
 @Resolver(() => Category)
@@ -17,33 +16,34 @@ export class CategoryResolver {
   @Mutation(() => Category)
   createCategory(
     @Args('createCategoryInput') createCategoryInput: CreateCategoryInput,
-    @CurrentUser() { id }
+    @CurrentUser() { id: userId }
   ) {
-    return this.categoryService.create(id, createCategoryInput);
+    return this.categoryService.create(userId, createCategoryInput);
   }
 
   @Query(() => [Category], { name: 'categories' })
-  findAll(@CurrentUser() { id }: User) {
-    return this.categoryService.findAll(id);
+  findAll(@CurrentUser() { id: userId }: User) {
+    return this.categoryService.findAll(userId);
   }
 
   @Query(() => Category, { name: 'category' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.categoryService.findOne(id);
+  findOne(@CurrentUser() { id: userId }, @Args('id') categoryId: string) {
+    return this.categoryService.findOne(userId, categoryId);
   }
 
   @Mutation(() => Category)
   updateCategory(
+    @CurrentUser() { id: userId },
     @Args('updateCategoryInput') updateCategoryInput: UpdateCategoryInput
   ) {
-    return this.categoryService.update(
-      updateCategoryInput.id,
-      updateCategoryInput
-    );
+    return this.categoryService.update(userId, updateCategoryInput);
   }
 
-  @Mutation(() => Category)
-  removeCategory(@Args('id', { type: () => Int }) id: number) {
-    return this.categoryService.remove(id);
+  @Mutation(() => Boolean)
+  removeCategory(
+    @CurrentUser() { id: userId },
+    @Args('id') categoryId: string
+  ) {
+    return this.categoryService.remove({ userId, categoryId });
   }
 }
