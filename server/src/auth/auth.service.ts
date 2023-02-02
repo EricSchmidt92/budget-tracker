@@ -35,12 +35,13 @@ export class AuthService {
     });
   }
 
-  logout(response: Response) {
-    response.cookie('Authentication', '', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      expires: new Date(),
-    });
+  async logout(response: Response) {
+    response.clearCookie('Authentication');
+    // response.cookie('Authentication', '', {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    //   expires: new Date(),
+    // });
   }
 }
