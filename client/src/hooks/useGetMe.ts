@@ -1,5 +1,5 @@
 import { graphql } from "@/gql";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
 const GET_ME = graphql(`
   query Me {
@@ -14,6 +14,9 @@ const useGetMe = () => {
   return useQuery(GET_ME, {
     errorPolicy: "all",
     onError: (err) => {
+      if (err.message === "Unauthorized") {
+        return;
+      }
       console.error("error: ", err);
     },
   });

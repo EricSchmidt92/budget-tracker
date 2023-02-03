@@ -1,38 +1,61 @@
 import { useCreateUser } from "@/hooks/useCreateUser";
-import { useLogin } from "@/hooks/useLogin";
+import { LoginRequest, useLogin } from "@/hooks/useLogin";
+import { Anchor, Box, Button, Center, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { useRouter } from "next/router";
-import styles from "../styles/Auth.module.css";
 
 const Signup = () => {
   const [createUser] = useCreateUser();
   const { login } = useLogin();
   const router = useRouter();
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    const data = {
-      email: event.target.email.value,
-      password: event.target.password.value,
-    };
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const handleSubmit = async (values: LoginRequest) => {
     await createUser({
       variables: {
-        createUserData: data,
+        createUserData: values,
       },
     });
 
-    await login(data);
+    await login(values);
     router.push("/");
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.container}>
-      <label htmlFor="email">Email</label>
-      <input type="email" name="email" id="id" required />
-      <label htmlFor="password">Password</label>
-      <input type="password" name="password" id="id" required />
-      <button type="submit">Submit</button>
-    </form>
+    <Center mx="auto" h="70%" miw={40}>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        <Box w="270px">
+          <TextInput
+            withAsterisk
+            label="Email"
+            placeholder="fake@fake.comx"
+            {...form.getInputProps("email")}
+          />
+
+          <TextInput
+            mt="sm"
+            withAsterisk
+            label="Password"
+            type="password"
+            placeholder="*****"
+            {...form.getInputProps("password")}
+          />
+
+          <Button my="md" type="submit" fullWidth>
+            Sign Up
+          </Button>
+          <Anchor component="button" onClick={() => router.push("/login")}>
+            Already have an account? Login here
+          </Anchor>
+        </Box>
+      </form>
+    </Center>
   );
 };
 

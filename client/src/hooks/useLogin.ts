@@ -2,7 +2,7 @@ import client from "@/constants/apollo-client";
 import authenticatedVar from "@/constants/authenticated";
 import { API_URL } from "@/constants/urls";
 
-interface LoginRequest {
+export interface LoginRequest {
   email: string;
   password: string;
 }
