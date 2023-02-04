@@ -13,6 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel-plugin for production.
  */
 const documents = {
+    "\n  mutation UpdateCategory($updateCategoryInput: UpdateCategoryInput!) {\n    updateCategory(updateCategoryInput: $updateCategoryInput) {\n      name\n      id\n    }\n  }\n": types.UpdateCategoryDocument,
+    "\n  mutation RemoveCategory($removeCategoryId: String!) {\n    removeCategory(id: $removeCategoryId)\n  }\n": types.RemoveCategoryDocument,
     "\n  mutation createUser($createUserData: CreateUserInput!) {\n    createUser(createUserData: $createUserData) {\n      id\n      email\n    }\n  }\n": types.CreateUserDocument,
     "\n  query Me {\n    me {\n      id\n      email\n    }\n  }\n": types.MeDocument,
     "\n  query Categories {\n    categories {\n      name\n      id\n    }\n  }\n": types.CategoriesDocument,
@@ -33,6 +35,14 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateCategory($updateCategoryInput: UpdateCategoryInput!) {\n    updateCategory(updateCategoryInput: $updateCategoryInput) {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateCategory($updateCategoryInput: UpdateCategoryInput!) {\n    updateCategory(updateCategoryInput: $updateCategoryInput) {\n      name\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveCategory($removeCategoryId: String!) {\n    removeCategory(id: $removeCategoryId)\n  }\n"): (typeof documents)["\n  mutation RemoveCategory($removeCategoryId: String!) {\n    removeCategory(id: $removeCategoryId)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

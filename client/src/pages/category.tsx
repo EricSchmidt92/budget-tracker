@@ -1,6 +1,16 @@
+import CategoryContainer from "@/components/Category/CategoryContainer";
 import { graphql } from "@/gql";
 import { useMutation, useQuery } from "@apollo/client";
-import { Box, Button, Group, Text, TextInput, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 
 import React, { useState } from "react";
 import { CirclePlus } from "tabler-icons-react";
@@ -70,28 +80,30 @@ const Category = () => {
       >
         Categories
       </Title>
-      {error && <Text>Error: {error.message} </Text>}
-      {loading && <Text>loading categories</Text>}
-      <Group my="lg" align="center">
-        <TextInput
-          type="text"
-          radius="md"
-          placeholder="Utilities"
-          error={inputError}
-          value={newCategoryVal}
-          onChange={handleInputChange}
-        />
-        <Button
-          leftIcon={<CirclePlus strokeWidth={1.6} size={20} />}
-          size="xs"
-          variant="light"
-          onClick={handleAddCategory}
-        >
-          Add Category
-        </Button>
-      </Group>
-      {categories &&
-        categories.map(({ id, name }) => <Box key={id}>{name}</Box>)}
+      <Center>
+        <Stack justify="center" align="start">
+          {error && <Text>Error: {error.message} </Text>}
+          <Group my="lg" align="center">
+            <TextInput
+              type="text"
+              radius="md"
+              placeholder="Utilities"
+              error={inputError}
+              value={newCategoryVal}
+              onChange={handleInputChange}
+            />
+            <Button
+              leftIcon={<CirclePlus strokeWidth={1.6} size={20} />}
+              size="xs"
+              onClick={handleAddCategory}
+            >
+              Add Category
+            </Button>
+          </Group>
+          {loading && <Text>loading categories</Text>}
+          {categories && <CategoryContainer categories={categories} />}
+        </Stack>
+      </Center>
     </>
   );
 };
