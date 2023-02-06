@@ -1,6 +1,8 @@
 import { graphql } from "@/gql";
+import { GET_CATEGORIES } from "@/pages/category";
 import { useMutation } from "@apollo/client";
 import { ActionIcon, Group, Text } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 import { useState } from "react";
 import { Edit, Trash } from "tabler-icons-react";
 import CategoryEditForm from "./CategoryEditForm";
@@ -10,7 +12,7 @@ export interface ListItemProps {
   category: Category;
 }
 
-const REMOVE_CATEGORY = graphql(`
+export const REMOVE_CATEGORY = graphql(`
   mutation RemoveCategory($removeCategoryId: String!) {
     removeCategory(id: $removeCategoryId)
   }
@@ -22,12 +24,25 @@ const CategoryListItem = ({ category }: ListItemProps) => {
   const [removeCategory] = useMutation(REMOVE_CATEGORY);
 
   const handleDeleteCategory = async () => {
-    await removeCategory({
-      variables: {
-        removeCategoryId: id,
-      },
-      refetchQueries: "active",
-    });
+    try {
+      await removeCategory({
+        variables: {
+          removeCategoryId: id,
+        },
+        refetchQueries: [{ query: GET_CATEGORIES }],
+      });
+      showNotification({
+        title: "Delete successful",
+        message: "The category was successfully deleted",
+        autoClose: false,
+      });
+    } catch (error) {
+      showNotification({
+        title: "Error",
+        message: "There was an error deleting the category",
+        color: "red",
+      });
+    }
   };
 
   return (
@@ -49,6 +64,9 @@ const CategoryListItem = ({ category }: ListItemProps) => {
               <Edit strokeWidth={1.5} />
             </ActionIcon>
             <ActionIcon
+              role="button"
+              data-testid={`delete-category-${id}`}
+              aria-label={`delete-category-${id}`}
               color="red"
               variant="subtle"
               onClick={handleDeleteCategory}

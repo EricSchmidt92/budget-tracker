@@ -2,7 +2,6 @@ import CategoryContainer from "@/components/Category/CategoryContainer";
 import { graphql } from "@/gql";
 import { useMutation, useQuery } from "@apollo/client";
 import {
-  Box,
   Button,
   Center,
   Group,
@@ -11,11 +10,12 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 
 import React, { useState } from "react";
 import { CirclePlus } from "tabler-icons-react";
 
-const GET_CATEGORIES = graphql(`
+export const GET_CATEGORIES = graphql(`
   query Categories {
     categories {
       name
@@ -54,20 +54,32 @@ const Category = () => {
       setInputError("Category name cannot be blank");
       return;
     }
-
-    await createCategory({
-      variables: {
-        createCategoryInput: {
-          name: newCategoryVal,
+    try {
+      await createCategory({
+        variables: {
+          createCategoryInput: {
+            name: newCategoryVal,
+          },
         },
-      },
-      refetchQueries: "active",
-      onError: (error) => console.error("error submitting query: ", error),
-      onCompleted: () => {
-        setNewCategoryVal("");
-        setInputError("");
-      },
-    });
+        refetchQueries: [{ query: GET_CATEGORIES }],
+        onError: (error) => console.error("error submitting query: ", error),
+        onCompleted: () => {
+          setNewCategoryVal("");
+          setInputError("");
+        },
+      });
+
+      showNotification({
+        title: "Success",
+        message: "Category successfully added",
+      });
+    } catch (error) {
+      showNotification({
+        title: "Error",
+        message: "An error occurred while adding the category",
+        color: "red",
+      });
+    }
   };
 
   return (

@@ -2,8 +2,10 @@ import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import authenticatedVar from "./authenticated";
 import { API_URL } from "./urls";
+import fetch from "cross-fetch";
 
 const httpLink = new HttpLink({
+  fetch,
   uri: `${API_URL}/graphql`,
   credentials: "same-origin",
 });

@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 interface GuardProps {
-  children: JSX.Element;
+  children: JSX.Element | React.ReactNode;
   excludedRoutes?: string[];
 }
 

@@ -13,7 +13,7 @@ interface User {
   email: string;
 }
 
-const CREATE_USER = graphql(`
+export const CREATE_USER = graphql(`
   mutation createUser($createUserData: CreateUserInput!) {
     createUser(createUserData: $createUserData) {
       id

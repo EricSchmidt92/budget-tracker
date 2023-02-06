@@ -10,6 +10,7 @@ import {
   ColorSchemeProvider,
   MantineProvider,
 } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
 import { getCookie, setCookie } from "cookies-next";
 import NextApp, { AppContext, AppProps } from "next/app";
 import { useState } from "react";
@@ -45,11 +46,13 @@ export default function App({
             primaryColor: "violet",
           }}
         >
-          <Guard excludedRoutes={["/login", "/signup"]}>
-            <AppShell navbar={<NavbarMinimal />} header={<NavbarHeader />}>
-              <Component {...pageProps} />
-            </AppShell>
-          </Guard>
+          <NotificationsProvider>
+            <Guard excludedRoutes={["/login", "/signup"]}>
+              <AppShell navbar={<NavbarMinimal />} header={<NavbarHeader />}>
+                <Component {...pageProps} />
+              </AppShell>
+            </Guard>
+          </NotificationsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </ApolloProvider>
