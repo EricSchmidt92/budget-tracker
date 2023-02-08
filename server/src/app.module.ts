@@ -6,6 +6,8 @@ import * as Joi from 'joi';
 import { AuthModule } from 'src/auth/auth.module';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { CategoryModule } from './category/category.module';
+import { BudgetModule } from './budget/budget.module';
+import { BudgetItemModule } from './budget-item/budget-item.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { CategoryModule } from './category/category.module';
       },
     }),
     CategoryModule,
+    BudgetModule,
+    BudgetItemModule,
   ],
   controllers: [],
   providers: [],
