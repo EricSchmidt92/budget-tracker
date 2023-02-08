@@ -42,5 +42,26 @@ describe("Category Page", () => {
     );
   });
 
+  it("displays new category on category creation", async () => {
+    const newCategoryText = "The new category text";
+
+    render(<Category />);
+    await screen.findByText(category1Regex);
+
+    const newCategoryInput = screen.getByRole("textbox", {
+      name: /add category/i,
+    });
+
+    await userEvent.type(newCategoryInput, newCategoryText);
+    expect(newCategoryInput).toHaveValue(newCategoryText);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /add category/i })
+    );
+
+    expect(await screen.findByText(newCategoryText)).toBeInTheDocument();
+    expect(newCategoryInput).toHaveValue("");
+  });
+
   it.todo("Test edit functionality");
 });
