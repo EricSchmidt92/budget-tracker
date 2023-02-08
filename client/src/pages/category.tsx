@@ -100,6 +100,7 @@ const Category = () => {
               type="text"
               radius="md"
               placeholder="Utilities"
+              aria-label="Add Category"
               error={inputError}
               value={newCategoryVal}
               onChange={handleInputChange}

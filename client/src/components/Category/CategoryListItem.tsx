@@ -34,7 +34,6 @@ const CategoryListItem = ({ category }: ListItemProps) => {
       showNotification({
         title: "Delete successful",
         message: "The category was successfully deleted",
-        autoClose: false,
       });
     } catch (error) {
       showNotification({

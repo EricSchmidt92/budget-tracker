@@ -1,6 +1,9 @@
 import {
   CategoriesQuery,
   CategoriesQueryVariables,
+  Category,
+  CreateCategoryMutation,
+  CreateCategoryMutationVariables,
   MeQuery,
   MeQueryVariables,
   RemoveCategoryMutation,
@@ -8,7 +11,7 @@ import {
 } from "@/gql/graphql";
 import { graphql } from "msw";
 
-export let categories: CategoriesQuery["categories"] = [
+const initialCategories: Category[] = [
   {
     id: "category-1",
     name: "electric",
@@ -20,6 +23,10 @@ export let categories: CategoriesQuery["categories"] = [
     __typename: "Category",
   },
 ];
+
+export let categories: Category[] = initialCategories;
+
+export const resetCategories = () => (categories = initialCategories);
 
 export const handlers = [
   graphql.query<MeQuery, MeQueryVariables>("Me", (_req, res, ctx) => {
@@ -56,6 +63,26 @@ export const handlers = [
           __typename: "Mutation",
           removeCategory: true,
         })
+      );
+    }
+  ),
+
+  graphql.mutation<CreateCategoryMutation, CreateCategoryMutationVariables>(
+    "CreateCategory",
+    (req, res, ctx) => {
+      const {
+        createCategoryInput: { name },
+      } = req.variables;
+      const newCategory: Category = {
+        __typename: "Category",
+        id: "category-3",
+        name,
+      };
+      categories.push(newCategory);
+      console.log("new categories for push: ", categories);
+
+      return res(
+        ctx.data({ __typename: "Mutation", createCategory: { name } })
       );
     }
   ),

@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
@@ -34,21 +33,10 @@ export class CategoryService {
     });
   }
 
-  async findOne(userId: string, categoryId: string) {
-    const { categories } = await this.prismaService.user.findUnique({
-      where: { id: userId },
-      select: {
-        categories: {
-          where: { id: categoryId },
-        },
-      },
+  async findOne(userId: string, categoryId: string): Promise<Category> {
+    return this.prismaService.category.findFirstOrThrow({
+      where: { userId, id: categoryId },
     });
-
-    if (categories.length < 1) {
-      throw new NotFoundException();
-    }
-
-    return categories[0];
   }
 
   async update(

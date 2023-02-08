@@ -15,8 +15,8 @@ export class CategoryResolver {
 
   @Mutation(() => Category)
   createCategory(
-    @Args('createCategoryInput') createCategoryInput: CreateCategoryInput,
-    @CurrentUser() { id: userId }
+    @CurrentUser() { id: userId },
+    @Args('createCategoryInput') createCategoryInput: CreateCategoryInput
   ) {
     return this.categoryService.create(userId, createCategoryInput);
   }
