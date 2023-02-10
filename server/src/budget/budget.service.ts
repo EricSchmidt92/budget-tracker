@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import BigNumber from 'bignumber.js';
 import { User } from 'src/auth/users/models/user.model';
 import { PrismaService } from 'src/prisma.service';
 import { CreateBudgetInput } from './dto/create-budget.input';
@@ -35,16 +36,6 @@ export class BudgetService {
         budgetItems: true,
       },
     });
-    // const ret = this.prismaService.user.findUnique({
-    //   where: { id: userId },
-    //   select: {
-
-    //     budgets: {
-    //       distinct
-    //       where: { id: budgetId },
-    //     },
-    //   },
-    // });
   }
 
   update(id: string, updateBudgetInput: UpdateBudgetInput) {
@@ -53,5 +44,24 @@ export class BudgetService {
 
   remove(id: string) {
     return `This action removes a #${id} budget`;
+  }
+
+  async updateCurrentTotal(budgetId: string) {
+    const budgetItems = await this.prismaService.budgetItem.findMany({
+      where: { budgetId },
+    });
+
+    const budgetItemsTotal = budgetItems.reduce(
+      (accumulator, budgetItem) =>
+        new BigNumber(budgetItem.amount).plus(accumulator),
+      new BigNumber(0)
+    );
+
+    return this.prismaService.budget.update({
+      where: { id: budgetId },
+      data: {
+        currentAmount: budgetItemsTotal.toNumber(),
+      },
+    });
   }
 }

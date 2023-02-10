@@ -40,8 +40,8 @@ async function main() {
         create: {
           name: 'Food Expenses',
           description: 'Budget for food',
-          amount: 100 * 100,
-
+          maxAmount: 100000,
+          currentAmount: 300 + 3000 + 5000,
           budgetItems: {
             create: [
               {
@@ -59,7 +59,7 @@ async function main() {
               },
               {
                 name: 'Meat',
-                amount: 300,
+                amount: 3000,
                 dueDate: new Date(),
                 paidDate: new Date(),
                 paid: true,
@@ -70,10 +70,9 @@ async function main() {
                   },
                 },
               },
-
               {
                 name: 'Makeup',
-                amount: 300,
+                amount: 5000,
                 dueDate: new Date(),
                 paidDate: new Date(),
                 paid: true,

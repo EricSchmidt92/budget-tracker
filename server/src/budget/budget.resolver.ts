@@ -11,7 +11,7 @@ import { BudgetService } from './budget.service';
 import { Budget } from './models/budget.model';
 import { CreateBudgetInput } from './dto/create-budget.input';
 import { UpdateBudgetInput } from './dto/update-budget.input';
-import { UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { BudgetItem } from 'src/budget-item/models/budget-item.model';
 import { BudgetItemResolver } from 'src/budget-item/budget-item.resolver';

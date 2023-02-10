@@ -1,4 +1,5 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLUSCurrency } from 'graphql-scalars';
 
 @InputType()
 export class CreateBudgetInput {
@@ -11,9 +12,8 @@ export class CreateBudgetInput {
   })
   description?: string;
 
-  @Field(() => Int, {
+  @Field(() => GraphQLUSCurrency, {
     description: 'The amount for the budget, so you know when you overspend',
-    defaultValue: 0,
   })
   amount: number;
 }

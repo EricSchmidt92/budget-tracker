@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { Decimal, PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
@@ -49,7 +49,10 @@ export class CategoryService {
         categories: {
           update: {
             where: { id },
-            data,
+            data: {
+              ...data,
+              // updatedAt: new Date(),
+            },
           },
         },
       },

@@ -1,4 +1,5 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLUSCurrency } from 'graphql-scalars';
 
 @InputType()
 export class CreateBudgetItemInput {
@@ -8,7 +9,7 @@ export class CreateBudgetItemInput {
   @Field()
   name: string;
 
-  @Field()
+  @Field(() => GraphQLUSCurrency)
   amount: number;
 
   @Field({ nullable: true })

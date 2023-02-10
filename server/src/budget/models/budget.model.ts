@@ -1,4 +1,5 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { GraphQLUSCurrency } from 'graphql-scalars';
 import { BudgetItem } from 'src/budget-item/models/budget-item.model';
 
 @ObjectType()
@@ -15,11 +16,16 @@ export class Budget {
   })
   description?: string;
 
-  @Field(() => Int, {
+  @Field(() => GraphQLUSCurrency, {
     description:
-      'The budget amount. This is the monetary amount to stay within for a budget',
+      "The budget's max amount. This is the monetary amount to stay within for a budget",
   })
-  amount: number;
+  maxAmount: number;
+
+  @Field(() => GraphQLUSCurrency, {
+    description: 'The sum of all the budget item amounts',
+  })
+  currentAmount: number;
 
   @Field(() => [BudgetItem])
   budgetItems: BudgetItem[];

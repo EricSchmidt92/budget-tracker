@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { GraphQLUSCurrency } from 'graphql-scalars';
 
 @ObjectType()
 export class BudgetItem {
@@ -8,7 +9,9 @@ export class BudgetItem {
   @Field({ description: 'Name for the budget item (e.g. "Target run") ' })
   name: string;
 
-  @Field({ description: 'The amount of the budget item in pennies' })
+  @Field((type) => GraphQLUSCurrency, {
+    description: 'The amount of the budget item in pennies',
+  })
   amount: number;
 
   @Field({
