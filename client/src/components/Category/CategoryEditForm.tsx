@@ -20,10 +20,7 @@ const UPDATE_CATEGORY = graphql(`
   }
 `);
 
-const CategoryEditForm = ({
-  onDoneEditing,
-  category: { name: initialVal, id },
-}: EditFormProps) => {
+const CategoryEditForm = ({ onDoneEditing, category: { name: initialVal, id } }: EditFormProps) => {
   const errorMessage = "You must enter a category name or cancel";
   const [categoryName, setCategoryName] = useState(initialVal);
   const [error, setError] = useState("");
@@ -73,11 +70,7 @@ const CategoryEditForm = ({
         <ActionIcon onClick={handleEditSubmit} color="green" variant="light">
           <Checkbox strokeWidth={1.5} />
         </ActionIcon>
-        <ActionIcon
-          color="red"
-          variant="light"
-          onClick={() => onDoneEditing(false)}
-        >
+        <ActionIcon color="red" variant="light" onClick={() => onDoneEditing(false)}>
           <CircleX strokeWidth={1.5} />
         </ActionIcon>
       </Group>

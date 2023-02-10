@@ -14,12 +14,14 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** A currency string, such as $21.25 */
+  USCurrency: any;
 };
 
 export type Budget = {
   __typename?: 'Budget';
   /** The budget amount. This is the monetary amount to stay within for a budget */
-  amount: Scalars['Int'];
+  amount: Scalars['USCurrency'];
   budgetItems: Array<BudgetItem>;
   /** An optional description for the budget */
   description?: Maybe<Scalars['String']>;
@@ -56,7 +58,7 @@ export type Category = {
 
 export type CreateBudgetInput = {
   /** The amount for the budget, so you know when you overspend */
-  amount?: InputMaybe<Scalars['Int']>;
+  amount: Scalars['USCurrency'];
   /** An optional description for the budget */
   description?: InputMaybe<Scalars['String']>;
   /** The budget name: e.g. "February Bills" */
@@ -64,7 +66,7 @@ export type CreateBudgetInput = {
 };
 
 export type CreateBudgetItemInput = {
-  amount: Scalars['Float'];
+  amount: Scalars['USCurrency'];
   budgetId: Scalars['String'];
   categoryId?: InputMaybe<Scalars['String']>;
   dueDate?: InputMaybe<Scalars['DateTime']>;
@@ -181,7 +183,7 @@ export type QueryCategoryArgs = {
 
 export type UpdateBudgetInput = {
   /** The amount for the budget, so you know when you overspend */
-  amount?: InputMaybe<Scalars['Int']>;
+  amount?: InputMaybe<Scalars['USCurrency']>;
   /** An optional description for the budget */
   description?: InputMaybe<Scalars['String']>;
   id: Scalars['String'];
@@ -190,7 +192,7 @@ export type UpdateBudgetInput = {
 };
 
 export type UpdateBudgetItemInput = {
-  amount?: InputMaybe<Scalars['Float']>;
+  amount?: InputMaybe<Scalars['USCurrency']>;
   budgetId?: InputMaybe<Scalars['String']>;
   categoryId?: InputMaybe<Scalars['String']>;
   dueDate?: InputMaybe<Scalars['DateTime']>;
@@ -244,7 +246,7 @@ export type BudgetQueryVariables = Exact<{
 }>;
 
 
-export type BudgetQuery = { __typename?: 'Query', budget: { __typename?: 'Budget', name: string, description?: string | null, amount: number, budgetItems: Array<{ __typename?: 'BudgetItem', name: string, note?: string | null }> } };
+export type BudgetQuery = { __typename?: 'Query', budget: { __typename?: 'Budget', name: string, description?: string | null, amount: any, budgetItems: Array<{ __typename?: 'BudgetItem', name: string, note?: string | null }> } };
 
 export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -261,7 +263,7 @@ export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: 
 export type BudgetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, amount: number, description?: string | null, name: string }> };
+export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, amount: any, description?: string | null, name: string }> };
 
 
 export const UpdateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"updateCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
