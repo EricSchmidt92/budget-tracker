@@ -9,7 +9,7 @@ const GET_BUDGET = graphql(`
     budget(id: $budgetId) {
       name
       description
-      amount
+      maxAmount
       budgetItems {
         name
         note

@@ -10,7 +10,7 @@ const GET_BUDGETS = graphql(`
   query Budgets {
     budgets {
       id
-      amount
+      maxAmount
       description
       name
     }
@@ -31,25 +31,24 @@ export default function Home() {
       <main>
         <>
           <Center>
-            <Title order={1} align="center" variant="gradient" gradient={{ from: "violet", to: "pink", deg: 45 }}>
-              Welcome to the Budget App
-            </Title>
+            {error && (
+              <Text>
+                {error.name}: {error.message}
+              </Text>
+            )}
           </Center>
           <SimpleGrid cols={3} w="70%" mt="lg" mx="auto">
             {budgets &&
-              budgets.map(({ id, name, description, amount }) => {
-                console.log("accounting: ", accounting.unformat(amount));
-                return (
-                  <Card key={id} mih={140} py="xl" component={Link} href={`/budget/${id}`}>
-                    <Card.Section inheritPadding>
-                      <Text align="center" weight="bold" fz="lg" color={theme.primaryColor}>
-                        {name} - {amount}
-                      </Text>
-                    </Card.Section>
-                    <Card.Section inheritPadding>{description}</Card.Section>
-                  </Card>
-                );
-              })}
+              budgets.map(({ id, name, description, maxAmount }) => (
+                <Card key={id} mih={140} py="xl" component={Link} href={`/budget/${id}`}>
+                  <Card.Section inheritPadding>
+                    <Text align="center" weight="bold" fz="lg" color={theme.primaryColor}>
+                      {name} - {maxAmount}
+                    </Text>
+                  </Card.Section>
+                  <Card.Section inheritPadding>{description}</Card.Section>
+                </Card>
+              ))}
           </SimpleGrid>
         </>
       </main>

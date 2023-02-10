@@ -5,7 +5,7 @@ import { useReactiveVar } from "@apollo/client";
 import { Navbar, NavLink, Stack, Text } from "@mantine/core";
 
 import { useRouter } from "next/router";
-import { Category, Home2, Login, Logout } from "tabler-icons-react";
+import { Category, CirclePlus, Login, Logout, ReportMoney } from "tabler-icons-react";
 
 interface NavProps {
   variant: "filled";
@@ -22,11 +22,7 @@ const NavbarMinimal = () => {
   const navLinkProps: NavProps = {
     variant: "filled",
     label: authenticated ? "Logout" : "Login",
-    icon: authenticated ? (
-      <Logout strokeWidth={1.5} />
-    ) : (
-      <Login strokeWidth={1.5} />
-    ),
+    icon: authenticated ? <Logout strokeWidth={1.5} /> : <Login strokeWidth={1.5} />,
   };
 
   return (
@@ -38,8 +34,8 @@ const NavbarMinimal = () => {
             <NavLink
               {...navLinkProps}
               onClick={() => router.push("/")}
-              label="Home"
-              icon={<Home2 strokeWidth={1.5} />}
+              label="Budgets"
+              icon={<ReportMoney strokeWidth={1.5} />}
               active={router.pathname === "/"}
             />
 
@@ -47,16 +43,20 @@ const NavbarMinimal = () => {
               {...navLinkProps}
               onClick={() => router.push("/category")}
               active={router.pathname === "/category"}
-              label="Category"
+              label="Categories"
               icon={<Category strokeWidth={1.5} />}
             />
 
-            <NavLink
-              {...navLinkProps}
-              onClick={async () => await logout()}
-              active={router.pathname === "/login"}
-            />
+            <NavLink {...navLinkProps} onClick={async () => await logout()} active={router.pathname === "/login"} />
           </Stack>
+          <NavLink
+            mt="xl"
+            {...navLinkProps}
+            icon={<CirclePlus strokeWidth={1.5} />}
+            label="New Budget"
+            onClick={() => router.push("/budget/create")}
+            active={router.pathname === "/budget/create"}
+          />
         </Stack>
       </Navbar.Section>
     </Navbar>
