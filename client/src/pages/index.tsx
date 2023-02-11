@@ -6,7 +6,7 @@ import accounting from "accounting";
 import Head from "next/head";
 import Link from "next/link";
 
-const GET_BUDGETS = graphql(`
+export const GET_BUDGETS = graphql(`
   query Budgets {
     budgets {
       id

@@ -36,7 +36,10 @@ const NavbarMinimal = () => {
               onClick={() => router.push("/")}
               label="Budgets"
               icon={<ReportMoney strokeWidth={1.5} />}
-              active={router.pathname === "/"}
+              active={
+                router.pathname === "/" ||
+                (router.pathname.startsWith("/budget") && !router.pathname.endsWith("create"))
+              }
             />
 
             <NavLink

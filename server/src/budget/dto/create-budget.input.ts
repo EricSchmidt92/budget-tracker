@@ -13,7 +13,7 @@ export class CreateBudgetInput {
   description?: string;
 
   @Field(() => GraphQLUSCurrency, {
-    description: 'The amount for the budget, so you know when you overspend',
+    description: 'The amount a budget should aim to stay below',
   })
-  amount: number;
+  maxAmount: number;
 }

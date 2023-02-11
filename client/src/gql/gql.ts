@@ -18,6 +18,7 @@ const documents = {
     "\n  mutation createUser($createUserData: CreateUserInput!) {\n    createUser(createUserData: $createUserData) {\n      id\n      email\n    }\n  }\n": types.CreateUserDocument,
     "\n  query Me {\n    me {\n      id\n      email\n    }\n  }\n": types.MeDocument,
     "\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      name\n      description\n      maxAmount\n      budgetItems {\n        name\n        note\n      }\n    }\n  }\n": types.BudgetDocument,
+    "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n": types.CreateBudgetDocument,
     "\n  query Categories {\n    categories {\n      name\n      id\n    }\n  }\n": types.CategoriesDocument,
     "\n  mutation CreateCategory($createCategoryInput: CreateCategoryInput!) {\n    createCategory(createCategoryInput: $createCategoryInput) {\n      name\n    }\n  }\n": types.CreateCategoryDocument,
     "\n  query Budgets {\n    budgets {\n      id\n      maxAmount\n      description\n      name\n    }\n  }\n": types.BudgetsDocument,
@@ -57,6 +58,10 @@ export function graphql(source: "\n  query Me {\n    me {\n      id\n      email
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      name\n      description\n      maxAmount\n      budgetItems {\n        name\n        note\n      }\n    }\n  }\n"): (typeof documents)["\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      name\n      description\n      maxAmount\n      budgetItems {\n        name\n        note\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
