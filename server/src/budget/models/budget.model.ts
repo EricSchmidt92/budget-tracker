@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { GraphQLUSCurrency } from 'graphql-scalars';
-import { BudgetItem } from 'src/budget-item/models/budget-item.model';
+import { Category } from 'src/category/entities/category.model';
 
 @ObjectType()
 export class Budget {
@@ -27,6 +27,6 @@ export class Budget {
   })
   currentAmount: number;
 
-  @Field(() => [BudgetItem])
-  budgetItems: BudgetItem[];
+  @Field(() => [Category])
+  categories: Category[];
 }

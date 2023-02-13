@@ -11,52 +11,50 @@ datasource db {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  password   String
-  budgets    Budget[]
-  categories Category[]
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  budgets  Budget[]
 }
 
 model Budget {
-  id            String       @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
   description   String?
-  maxAmount     Int          @default(0)
-  budgetItems   BudgetItem[]
-  currentAmount Int          @default(0)
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String
+  maxAmount     Int      @default(0)
+  currentAmount Int      @default(0)
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model BudgetItem {
-  budget   Budget @relation(fields: [budgetId], references: [id])
-  budgetId String
-
-  id       String    @id @default(uuid())
-  name     String
-  amount   Int
-  dueDate  DateTime?
-  paidDate DateTime?
-  paid     Boolean   @default(false)
-  note     String?
-
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId String?
+  categories Category[]
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
 }
 
 model Category {
-  id         String       @id @default(uuid())
-  name       String
-  budgetItem BudgetItem[]
-  User       User         @relation(fields: [userId], references: [id])
-  userId     String
+  id            String   @id @default(uuid())
+  name          String
+  currentAmount Int      @default(0)
+  maxAmount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  budgetItems BudgetItem[]
+  Budget      Budget       @relation(fields: [budgetId], references: [id])
+  budgetId    String
+}
+
+model BudgetItem {
+  id        String    @id @default(uuid())
+  name      String
+  amount    Int
+  dueDate   DateTime?
+  paidDate  DateTime?
+  paid      Boolean   @default(false)
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
 }

@@ -42,10 +42,18 @@ export class BudgetItemService {
     return budgetItem;
   }
 
-  findAll(budgetId: string) {
+  async findAll(budgetId: string) {
     return this.prismaService.budgetItem.findMany({
       where: {
         budgetId,
+      },
+      include: {
+        category: true,
+      },
+      orderBy: {
+        category: {
+          name: 'asc',
+        },
       },
     });
   }

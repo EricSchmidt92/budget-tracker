@@ -1,22 +1,21 @@
+import { UseGuards } from '@nestjs/common';
 import {
-  Resolver,
-  Query,
-  Mutation,
   Args,
-  Int,
-  ResolveField,
+  Mutation,
   Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
+import { User } from 'src/auth/users/models/user.model';
+import { BudgetItemResolver } from 'src/budget-item/budget-item.resolver';
+import { BudgetItem } from 'src/budget-item/models/budget-item.model';
 import { BudgetService } from './budget.service';
-import { Budget } from './models/budget.model';
 import { CreateBudgetInput } from './dto/create-budget.input';
 import { UpdateBudgetInput } from './dto/update-budget.input';
-import { forwardRef, Inject, UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
-import { BudgetItem } from 'src/budget-item/models/budget-item.model';
-import { BudgetItemResolver } from 'src/budget-item/budget-item.resolver';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'src/auth/users/models/user.model';
+import { Budget } from './models/budget.model';
 
 @UseGuards(GqlAuthGuard)
 @Resolver(() => Budget)

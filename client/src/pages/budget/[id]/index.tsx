@@ -18,10 +18,23 @@ const GET_BUDGET = graphql(`
   }
 `);
 
+`
+budget() {
+  name
+  description
+  categories {
+    name
+    budgeItems {
+
+    }
+  }
+}
+`;
+
 const BudgetPage: NextPage = () => {
   const { query } = useRouter();
-  const { primaryColor } = useMantineTheme();
   const budgetId = query.id as string;
+  const { primaryColor } = useMantineTheme();
   const { data: { budget } = {} } = useQuery(GET_BUDGET, {
     variables: {
       budgetId,

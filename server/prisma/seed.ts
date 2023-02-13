@@ -21,78 +21,165 @@ async function main() {
     },
   });
 
-  const foodCategory = await prisma.category.create({
+  const monthlyBudget = await prisma.budget.create({
     data: {
-      name: 'food',
-      userId: userId,
+      name: 'Monthly Budget',
+      userId,
+      description: 'This is the monthly budget we use it every month',
     },
   });
 
-  const cosmeticsCategory = await prisma.category.create({
+  const foodBudget = await prisma.budget.create({
     data: {
-      name: 'cosmetics',
-      userId: userId,
+      name: 'Food Budget',
+      userId,
+      description: 'This is the monthly food budget',
     },
   });
-  const updatedUser = await prisma.user.update({
+
+  const electricCategory = await prisma.category.create({
     data: {
+      budgetId: monthlyBudget.id,
+      name: 'Electric bill',
+      maxAmount: 10000,
+      currentAmount: 10000,
+    },
+  });
+
+  const foodCategory = await prisma.category.create({
+    data: {
+      budgetId: monthlyBudget.id,
+      name: 'Food',
+      maxAmount: 10000,
+      currentAmount: 5000,
+    },
+  });
+
+  await prisma.budgetItem.createMany({
+    data: [
+      {
+        name: "Tony's run",
+        amount: 2000,
+        dueDate: new Date(),
+        paidDate: new Date(),
+        paid: true,
+        note: 'For Chilaquiles',
+        categoryId: foodCategory.id,
+      },
+      {
+        name: 'Walmart run',
+        amount: 2490,
+        dueDate: new Date(),
+        paidDate: new Date(),
+        paid: true,
+        note: 'For chips and pizza',
+        categoryId: foodCategory.id,
+      },
+    ],
+  });
+
+  await prisma.budgetItem.create({
+    data: {
+      categoryId: electricCategory.id,
+      name: 'Comed',
+      amount: 9000,
+      paid: true,
+      dueDate: new Date(),
+      paidDate: new Date(),
+      note: 'Paid early',
+    },
+  });
+
+  // const foodCategory = await prisma.category.create({
+  //   data: {
+  //     name: 'food',
+  //     userId: userId,
+  //   },
+  // });
+
+  // const cosmeticsCategory = await prisma.category.create({
+  //   data: {
+  //     name: 'cosmetics',
+  //     userId: userId,
+  //   },
+  // });
+  // const updatedUser = await prisma.user.update({
+  //   data: {
+  //     budgets: {
+  //       create: {
+  //         name: 'Food Expenses',
+  //         description: 'Budget for food',
+  //         maxAmount: 100000,
+  //         currentAmount: 300 + 3000 + 5000,
+  //         budgetItems: {
+  //           create: [
+  //             {
+  //               name: 'Veggies',
+  //               amount: 300,
+  //               dueDate: new Date(),
+  //               paidDate: new Date(),
+  //               paid: true,
+  //               note: 'This is for our veggies',
+  //               category: {
+  //                 connect: {
+  //                   id: foodCategory.id,
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               name: 'Meat',
+  //               amount: 3000,
+  //               dueDate: new Date(),
+  //               paidDate: new Date(),
+  //               paid: true,
+  //               note: 'This is for our meat spending',
+  //               category: {
+  //                 connect: {
+  //                   id: foodCategory.id,
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               name: 'Makeup',
+  //               amount: 5000,
+  //               dueDate: new Date(),
+  //               paidDate: new Date(),
+  //               paid: true,
+  //               category: {
+  //                 connect: {
+  //                   id: cosmeticsCategory.id,
+  //                 },
+  //               },
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     },
+  //   },
+  //   where: {
+  //     id: userId,
+  //   },
+  // });
+
+  console.log('seeded user1: ', userBase);
+  const fullUserData = await prisma.user.findUnique({
+    where: {
+      id: userBase.id,
+    },
+    include: {
       budgets: {
-        create: {
-          name: 'Food Expenses',
-          description: 'Budget for food',
-          maxAmount: 100000,
-          currentAmount: 300 + 3000 + 5000,
-          budgetItems: {
-            create: [
-              {
-                name: 'Veggies',
-                amount: 300,
-                dueDate: new Date(),
-                paidDate: new Date(),
-                paid: true,
-                note: 'This is for our veggies',
-                category: {
-                  connect: {
-                    id: foodCategory.id,
-                  },
-                },
-              },
-              {
-                name: 'Meat',
-                amount: 3000,
-                dueDate: new Date(),
-                paidDate: new Date(),
-                paid: true,
-                note: 'This is for our meat spending',
-                category: {
-                  connect: {
-                    id: foodCategory.id,
-                  },
-                },
-              },
-              {
-                name: 'Makeup',
-                amount: 5000,
-                dueDate: new Date(),
-                paidDate: new Date(),
-                paid: true,
-                category: {
-                  connect: {
-                    id: cosmeticsCategory.id,
-                  },
-                },
-              },
-            ],
+        include: {
+          categories: {
+            include: {
+              budgetItems: true,
+            },
           },
         },
       },
     },
-    where: {
-      id: userId,
-    },
   });
 
-  console.log('seeded user1: ', updatedUser);
+  console.log('fullUser: ', fullUserData);
 }
 
 main()

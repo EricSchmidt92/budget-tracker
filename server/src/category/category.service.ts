@@ -7,7 +7,7 @@ import { Decimal, PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Category } from './entities/category.entity';
+import { Category } from './entities/category.model';
 
 @Injectable()
 export class CategoryService {
