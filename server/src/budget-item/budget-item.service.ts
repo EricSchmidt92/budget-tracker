@@ -1,10 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { BudgetService } from 'src/budget/budget.service';
+import { Injectable } from '@nestjs/common';
+import { BudgetItem } from '@prisma/client';
+import { CategoryService } from 'src/category/category.service';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateBudgetItemInput } from './dto/create-budget-item.input';
 import { UpdateBudgetItemInput } from './dto/update-budget-item.input';
-import { BudgetItem } from './models/budget-item.model';
 
 const connect = (id?: string): { connect: { id: string } } | undefined => {
   return id
@@ -18,34 +18,25 @@ const connect = (id?: string): { connect: { id: string } } | undefined => {
 
 @Injectable()
 export class BudgetItemService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly budgetService: BudgetService
-  ) {}
+  constructor(private readonly prismaService: PrismaService, private readonly categoryService: CategoryService) {}
 
-  async create({
-    budgetId,
-    categoryId,
-    ...budgetItemData
-  }: CreateBudgetItemInput): Promise<BudgetItem> {
+  async create(userId: string, createBudgetItemInput: CreateBudgetItemInput): Promise<BudgetItem> {
     const budgetItem = await this.prismaService.budgetItem.create({
       data: {
-        budget: connect(budgetId),
-
-        category: connect(categoryId),
-        ...budgetItemData,
+        ...createBudgetItemInput,
+        userId,
       },
     });
 
-    await this.budgetService.updateCurrentTotal(budgetId);
+    await this.categoryService.updateCurrentTotal(createBudgetItemInput.categoryId);
 
     return budgetItem;
   }
 
-  async findAll(budgetId: string) {
+  async findAll(categoryId: string) {
     return this.prismaService.budgetItem.findMany({
       where: {
-        budgetId,
+        categoryId,
       },
       include: {
         category: true,

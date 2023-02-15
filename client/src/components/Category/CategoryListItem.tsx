@@ -1,5 +1,5 @@
 import { graphql } from "@/gql";
-import { GET_CATEGORIES } from "@/pages/category";
+import { GET_CATEGORIES } from "@/components/Category/category";
 import { useMutation } from "@apollo/client";
 import { ActionIcon, Group, Text } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
@@ -47,19 +47,12 @@ const CategoryListItem = ({ category }: ListItemProps) => {
   return (
     <Group w="100%">
       {isEditing ? (
-        <CategoryEditForm
-          category={category}
-          onDoneEditing={(val: boolean) => setIsEditing(val)}
-        />
+        <CategoryEditForm category={category} onDoneEditing={(val: boolean) => setIsEditing(val)} />
       ) : (
         <>
           <Text sx={{ flex: 2 }}>{name}</Text>
           <Group>
-            <ActionIcon
-              color="yellow"
-              variant="subtle"
-              onClick={() => setIsEditing(true)}
-            >
+            <ActionIcon color="yellow" variant="subtle" onClick={() => setIsEditing(true)}>
               <Edit strokeWidth={1.5} />
             </ActionIcon>
             <ActionIcon

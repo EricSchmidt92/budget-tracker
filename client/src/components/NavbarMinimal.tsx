@@ -44,9 +44,9 @@ const NavbarMinimal = () => {
 
             <NavLink
               {...navLinkProps}
-              onClick={() => router.push("/category")}
-              active={router.pathname === "/category"}
+              onClick={() => router.push("/")}
               label="Categories"
+              description="Not active, needs work or removal"
               icon={<Category strokeWidth={1.5} />}
             />
 

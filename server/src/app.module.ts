@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { BudgetItemModule } from './budget-item/budget-item.module';
 import { BudgetModule } from './budget/budget.module';
 import { CategoryModule } from './category/category.module';
+import { USCurrencyResolver, GraphQLUSCurrency } from 'graphql-scalars';
 
 @Module({
   imports: [
@@ -32,6 +33,9 @@ import { CategoryModule } from './category/category.module';
       cors: {
         credentials: true,
         origin: true,
+      },
+      resolvers: {
+        USCurrency: USCurrencyResolver,
       },
     }),
     CategoryModule,

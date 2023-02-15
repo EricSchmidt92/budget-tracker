@@ -4,4 +4,7 @@ import { Field, InputType } from '@nestjs/graphql';
 export class CreateCategoryInput {
   @Field({ description: 'The name of the budget item category' })
   name: string;
+
+  @Field()
+  budgetId: string;
 }

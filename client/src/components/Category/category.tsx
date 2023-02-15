@@ -1,23 +1,19 @@
 import CategoryContainer from "@/components/Category/CategoryContainer";
 import { graphql } from "@/gql";
 import { useMutation, useQuery } from "@apollo/client";
-import {
-  Button,
-  Center,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { Button, Center, Group, Stack, Text, TextInput, Title } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 
 import React, { useState } from "react";
 import { CirclePlus } from "tabler-icons-react";
 
+//TODO: possibly reuse this component from the budget page to change categories?
+
 export const GET_CATEGORIES = graphql(`
-  query Categories {
-    categories {
+  query Categories($budgetId: String!) {
+    categories(budgetId: $budgetId) {
+      currentAmount
+      maxAmount
       name
       id
     }
@@ -27,17 +23,16 @@ export const GET_CATEGORIES = graphql(`
 const CREATE_CATEGORY = graphql(`
   mutation CreateCategory($createCategoryInput: CreateCategoryInput!) {
     createCategory(createCategoryInput: $createCategoryInput) {
+      currentAmount
+      id
+      maxAmount
       name
     }
   }
 `);
 
 const Category = () => {
-  const {
-    data: { categories } = {},
-    loading,
-    error,
-  } = useQuery(GET_CATEGORIES);
+  const { data: { categories } = {}, loading, error } = useQuery(GET_CATEGORIES);
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
 
@@ -59,6 +54,7 @@ const Category = () => {
         variables: {
           createCategoryInput: {
             name: newCategoryVal,
+            budgetId: "",
           },
         },
         refetchQueries: [{ query: GET_CATEGORIES }],
@@ -84,12 +80,7 @@ const Category = () => {
 
   return (
     <>
-      <Title
-        align="center"
-        order={1}
-        variant="gradient"
-        gradient={{ from: "violet.9", to: "violet.4", deg: 45 }}
-      >
+      <Title align="center" order={1} variant="gradient" gradient={{ from: "violet.9", to: "violet.4", deg: 45 }}>
         Categories
       </Title>
       <Center>
@@ -105,11 +96,7 @@ const Category = () => {
               value={newCategoryVal}
               onChange={handleInputChange}
             />
-            <Button
-              leftIcon={<CirclePlus strokeWidth={1.6} size={20} />}
-              size="xs"
-              onClick={handleAddCategory}
-            >
+            <Button leftIcon={<CirclePlus strokeWidth={1.6} size={20} />} size="xs" onClick={handleAddCategory}>
               Add Category
             </Button>
           </Group>

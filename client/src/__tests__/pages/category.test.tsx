@@ -1,4 +1,4 @@
-import Category from "@/pages/category";
+import Category from "@/components/Category/category";
 import { render, screen, waitFor } from "@utils/test-utils";
 import userEvent from "@testing-library/user-event";
 import { categories } from "@/mocks/handlers";
@@ -37,9 +37,7 @@ describe("Category Page", () => {
       })
     );
 
-    await waitFor(() =>
-      expect(screen.queryByText(category1Regex)).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.queryByText(category1Regex)).not.toBeInTheDocument());
   });
 
   it("displays new category on category creation", async () => {
@@ -55,9 +53,7 @@ describe("Category Page", () => {
     await userEvent.type(newCategoryInput, newCategoryText);
     expect(newCategoryInput).toHaveValue(newCategoryText);
 
-    await userEvent.click(
-      screen.getByRole("button", { name: /add category/i })
-    );
+    await userEvent.click(screen.getByRole("button", { name: /add category/i }));
 
     expect(await screen.findByText(newCategoryText)).toBeInTheDocument();
     expect(newCategoryInput).toHaveValue("");

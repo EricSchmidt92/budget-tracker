@@ -11,8 +11,7 @@ export class Category {
   name: string;
 
   @Field(() => GraphQLUSCurrency, {
-    description:
-      "The category's max amount. This is the monetary amount to stay within for a specific category",
+    description: "The category's max amount. This is the monetary amount to stay within for a specific category",
   })
   maxAmount: number;
 

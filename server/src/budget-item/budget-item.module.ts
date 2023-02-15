@@ -1,11 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { BudgetModule } from 'src/budget/budget.module';
+import { CategoryModule } from 'src/category/category.module';
 import { PrismaService } from 'src/prisma.service';
 import { BudgetItemResolver } from './budget-item.resolver';
 import { BudgetItemService } from './budget-item.service';
 
 @Module({
-  imports: [forwardRef(() => BudgetModule)],
+  imports: [forwardRef(() => CategoryModule)],
   providers: [BudgetItemResolver, BudgetItemService, PrismaService],
   exports: [BudgetItemResolver],
 })

@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { GraphQLUSCurrency, USCurrencyResolver } from 'graphql-scalars';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -15,12 +16,12 @@ export type Scalars = {
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
   /** A currency string, such as $21.25 */
-  USCurrency: any;
+  USCurrency: "USCurrency";
 };
 
 export type Budget = {
   __typename?: 'Budget';
-  budgetItems: Array<BudgetItem>;
+  categories: Array<Category>;
   /** The sum of all the budget item amounts */
   currentAmount: Scalars['USCurrency'];
   /** An optional description for the budget */
@@ -36,7 +37,6 @@ export type BudgetItem = {
   __typename?: 'BudgetItem';
   /** The amount of the budget item in pennies */
   amount: Scalars['USCurrency'];
-  createdAt: Scalars['DateTime'];
   /** Optional due date for a budget item. Due date and paid date are useful for things such as a utility bill */
   dueDate?: Maybe<Scalars['DateTime']>;
   id: Scalars['ID'];
@@ -48,12 +48,16 @@ export type BudgetItem = {
   paid: Scalars['Boolean'];
   /** Optional date for when a budget item is paid. */
   paidDate?: Maybe<Scalars['DateTime']>;
-  updatedAt: Scalars['DateTime'];
 };
 
 export type Category = {
   __typename?: 'Category';
+  budgetItems: Array<BudgetItem>;
+  /** The sum of all budget item amounts for a specific category */
+  currentAmount: Scalars['USCurrency'];
   id: Scalars['ID'];
+  /** The category's max amount. This is the monetary amount to stay within for a specific category */
+  maxAmount: Scalars['USCurrency'];
   /** The name of the category */
   name: Scalars['String'];
 };
@@ -69,7 +73,6 @@ export type CreateBudgetInput = {
 
 export type CreateBudgetItemInput = {
   amount: Scalars['USCurrency'];
-  budgetId: Scalars['String'];
   categoryId?: InputMaybe<Scalars['String']>;
   dueDate?: InputMaybe<Scalars['DateTime']>;
   name: Scalars['String'];
@@ -79,6 +82,7 @@ export type CreateBudgetItemInput = {
 };
 
 export type CreateCategoryInput = {
+  budgetId: Scalars['String'];
   /** The name of the budget item category */
   name: Scalars['String'];
 };
@@ -94,11 +98,7 @@ export type Mutation = {
   createBudgetItem: BudgetItem;
   createCategory: Category;
   createUser: User;
-  removeBudget: Budget;
-  removeBudgetItem: BudgetItem;
   removeCategory: Scalars['Boolean'];
-  updateBudget: Budget;
-  updateBudgetItem: BudgetItem;
   updateCategory: Category;
 };
 
@@ -123,28 +123,8 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationRemoveBudgetArgs = {
-  id: Scalars['String'];
-};
-
-
-export type MutationRemoveBudgetItemArgs = {
-  id: Scalars['String'];
-};
-
-
 export type MutationRemoveCategoryArgs = {
   id: Scalars['String'];
-};
-
-
-export type MutationUpdateBudgetArgs = {
-  updateBudgetInput: UpdateBudgetInput;
-};
-
-
-export type MutationUpdateBudgetItemArgs = {
-  updateBudgetItemInput: UpdateBudgetItemInput;
 };
 
 
@@ -155,7 +135,6 @@ export type MutationUpdateCategoryArgs = {
 export type Query = {
   __typename?: 'Query';
   budget: Budget;
-  budgetItem: BudgetItem;
   budgetItems: Array<BudgetItem>;
   budgets: Array<Budget>;
   categories: Array<Category>;
@@ -169,12 +148,12 @@ export type QueryBudgetArgs = {
 };
 
 
-export type QueryBudgetItemArgs = {
-  id: Scalars['String'];
+export type QueryBudgetItemsArgs = {
+  categoryId: Scalars['String'];
 };
 
 
-export type QueryBudgetItemsArgs = {
+export type QueryCategoriesArgs = {
   budgetId: Scalars['String'];
 };
 
@@ -183,29 +162,8 @@ export type QueryCategoryArgs = {
   id: Scalars['String'];
 };
 
-export type UpdateBudgetInput = {
-  /** An optional description for the budget */
-  description?: InputMaybe<Scalars['String']>;
-  id: Scalars['String'];
-  /** The amount a budget should aim to stay below */
-  maxAmount?: InputMaybe<Scalars['USCurrency']>;
-  /** The budget name: e.g. "February Bills" */
-  name?: InputMaybe<Scalars['String']>;
-};
-
-export type UpdateBudgetItemInput = {
-  amount?: InputMaybe<Scalars['USCurrency']>;
-  budgetId?: InputMaybe<Scalars['String']>;
-  categoryId?: InputMaybe<Scalars['String']>;
-  dueDate?: InputMaybe<Scalars['DateTime']>;
-  id: Scalars['ID'];
-  name?: InputMaybe<Scalars['String']>;
-  note?: InputMaybe<Scalars['String']>;
-  paid?: InputMaybe<Scalars['Boolean']>;
-  paidDate?: InputMaybe<Scalars['DateTime']>;
-};
-
 export type UpdateCategoryInput = {
+  budgetId?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
   /** The name of the budget item category */
   name?: InputMaybe<Scalars['String']>;
@@ -231,6 +189,20 @@ export type RemoveCategoryMutationVariables = Exact<{
 
 export type RemoveCategoryMutation = { __typename?: 'Mutation', removeCategory: boolean };
 
+export type CategoriesQueryVariables = Exact<{
+  budgetId: Scalars['String'];
+}>;
+
+
+export type CategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', currentAmount: "USCurrency", maxAmount: "USCurrency", name: string, id: string }> };
+
+export type CreateCategoryMutationVariables = Exact<{
+  createCategoryInput: CreateCategoryInput;
+}>;
+
+
+export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'Category', currentAmount: "USCurrency", id: string, maxAmount: "USCurrency", name: string } };
+
 export type CreateUserMutationVariables = Exact<{
   createUserData: CreateUserInput;
 }>;
@@ -248,7 +220,7 @@ export type BudgetQueryVariables = Exact<{
 }>;
 
 
-export type BudgetQuery = { __typename?: 'Query', budget: { __typename?: 'Budget', name: string, description?: string | null, maxAmount: any, budgetItems: Array<{ __typename?: 'BudgetItem', name: string, note?: string | null }> } };
+export type BudgetQuery = { __typename?: 'Query', budget: { __typename?: 'Budget', currentAmount: "USCurrency", description?: string | null, id: string, maxAmount: "USCurrency", name: string, categories: Array<{ __typename?: 'Category', name: string, maxAmount: "USCurrency", id: string, currentAmount: "USCurrency", budgetItems: Array<{ __typename?: 'BudgetItem', amount: "USCurrency", dueDate?: any | null, id: string, name: string, note?: string | null, paid: boolean, paidDate?: any | null }> }> } };
 
 export type CreateBudgetMutationVariables = Exact<{
   createBudgetInput: CreateBudgetInput;
@@ -257,30 +229,186 @@ export type CreateBudgetMutationVariables = Exact<{
 
 export type CreateBudgetMutation = { __typename?: 'Mutation', createBudget: { __typename?: 'Budget', id: string } };
 
-export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', name: string, id: string }> };
-
-export type CreateCategoryMutationVariables = Exact<{
-  createCategoryInput: CreateCategoryInput;
-}>;
-
-
-export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'Category', name: string } };
-
 export type BudgetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, maxAmount: any, description?: string | null, name: string }> };
+export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, maxAmount: "USCurrency", description?: string | null, name: string }> };
 
 
 export const UpdateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"updateCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
 export const RemoveCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}}}]}]}}]} as unknown as DocumentNode<RemoveCategoryMutation, RemoveCategoryMutationVariables>;
+export const CategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Categories"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"categories"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"budgetId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CategoriesQuery, CategoriesQueryVariables>;
+export const CreateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateCategoryMutation, CreateCategoryMutationVariables>;
 export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createUserData"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createUserData"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createUserData"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
-export const BudgetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Budget"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"budget"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"budgetItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"note"}}]}}]}}]}}]} as unknown as DocumentNode<BudgetQuery, BudgetQueryVariables>;
+export const BudgetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Budget"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"budget"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"budgetId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"budgetItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"note"}},{"kind":"Field","name":{"kind":"Name","value":"paid"}},{"kind":"Field","name":{"kind":"Name","value":"paidDate"}}]}}]}}]}}]}}]} as unknown as DocumentNode<BudgetQuery, BudgetQueryVariables>;
 export const CreateBudgetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateBudget"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateBudgetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createBudget"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createBudgetInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateBudgetMutation, CreateBudgetMutationVariables>;
-export const CategoriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"categories"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CategoriesQuery, CategoriesQueryVariables>;
-export const CreateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateCategoryMutation, CreateCategoryMutationVariables>;
 export const BudgetsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Budgets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"budgets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<BudgetsQuery, BudgetsQueryVariables>;
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
+  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
+  DateTime: any;
+  /** A currency string, such as $21.25 */
+  USCurrency: "USCurrency";
+};
+
+export type Budget = {
+  __typename?: 'Budget';
+  categories: Array<Category>;
+  /** The sum of all the budget item amounts */
+  currentAmount: Scalars['USCurrency'];
+  /** An optional description for the budget */
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  /** The budget's max amount. This is the monetary amount to stay within for a budget */
+  maxAmount: Scalars['USCurrency'];
+  /** The name of the budget */
+  name: Scalars['String'];
+};
+
+export type BudgetItem = {
+  __typename?: 'BudgetItem';
+  /** The amount of the budget item in pennies */
+  amount: Scalars['USCurrency'];
+  /** Optional due date for a budget item. Due date and paid date are useful for things such as a utility bill */
+  dueDate?: Maybe<Scalars['DateTime']>;
+  id: Scalars['ID'];
+  /** Name for the budget item (e.g. "Target run")  */
+  name: Scalars['String'];
+  /** Optional additional information for a budget item */
+  note?: Maybe<Scalars['String']>;
+  /** If an item has been paid or not */
+  paid: Scalars['Boolean'];
+  /** Optional date for when a budget item is paid. */
+  paidDate?: Maybe<Scalars['DateTime']>;
+};
+
+export type Category = {
+  __typename?: 'Category';
+  budgetItems: Array<BudgetItem>;
+  /** The sum of all budget item amounts for a specific category */
+  currentAmount: Scalars['USCurrency'];
+  id: Scalars['ID'];
+  /** The category's max amount. This is the monetary amount to stay within for a specific category */
+  maxAmount: Scalars['USCurrency'];
+  /** The name of the category */
+  name: Scalars['String'];
+};
+
+export type CreateBudgetInput = {
+  /** An optional description for the budget */
+  description?: InputMaybe<Scalars['String']>;
+  /** The amount a budget should aim to stay below */
+  maxAmount: Scalars['USCurrency'];
+  /** The budget name: e.g. "February Bills" */
+  name: Scalars['String'];
+};
+
+export type CreateBudgetItemInput = {
+  amount: Scalars['USCurrency'];
+  categoryId?: InputMaybe<Scalars['String']>;
+  dueDate?: InputMaybe<Scalars['DateTime']>;
+  name: Scalars['String'];
+  note?: InputMaybe<Scalars['String']>;
+  paid: Scalars['Boolean'];
+  paidDate?: InputMaybe<Scalars['DateTime']>;
+};
+
+export type CreateCategoryInput = {
+  budgetId: Scalars['String'];
+  /** The name of the budget item category */
+  name: Scalars['String'];
+};
+
+export type CreateUserInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createBudget: Budget;
+  createBudgetItem: BudgetItem;
+  createCategory: Category;
+  createUser: User;
+  removeCategory: Scalars['Boolean'];
+  updateCategory: Category;
+};
+
+
+export type MutationCreateBudgetArgs = {
+  createBudgetInput: CreateBudgetInput;
+};
+
+
+export type MutationCreateBudgetItemArgs = {
+  createBudgetItemInput: CreateBudgetItemInput;
+};
+
+
+export type MutationCreateCategoryArgs = {
+  createCategoryInput: CreateCategoryInput;
+};
+
+
+export type MutationCreateUserArgs = {
+  createUserData: CreateUserInput;
+};
+
+
+export type MutationRemoveCategoryArgs = {
+  id: Scalars['String'];
+};
+
+
+export type MutationUpdateCategoryArgs = {
+  updateCategoryInput: UpdateCategoryInput;
+};
+
+export type Query = {
+  __typename?: 'Query';
+  budget: Budget;
+  budgetItems: Array<BudgetItem>;
+  budgets: Array<Budget>;
+  categories: Array<Category>;
+  category: Category;
+  me: User;
+};
+
+
+export type QueryBudgetArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryBudgetItemsArgs = {
+  categoryId: Scalars['String'];
+};
+
+
+export type QueryCategoriesArgs = {
+  budgetId: Scalars['String'];
+};
+
+
+export type QueryCategoryArgs = {
+  id: Scalars['String'];
+};
+
+export type UpdateCategoryInput = {
+  budgetId?: InputMaybe<Scalars['String']>;
+  id: Scalars['ID'];
+  /** The name of the budget item category */
+  name?: InputMaybe<Scalars['String']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  email: Scalars['String'];
+  id: Scalars['ID'];
+};

@@ -1,18 +1,16 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Decimal, PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Category } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import BigNumber from 'bignumber.js';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Category } from './entities/category.model';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prismaService: PrismaService) {}
-  create(userId: string, createCategoryInput: CreateCategoryInput) {
+
+  create(userId: string, createCategoryInput: CreateCategoryInput): Promise<Category> {
     return this.prismaService.category.create({
       data: {
         ...createCategoryInput,
@@ -21,92 +19,69 @@ export class CategoryService {
     });
   }
 
-  findAll(userId: string): Promise<Category[]> {
+  findAll(budgetId: string): Promise<Category[]> {
     return this.prismaService.category.findMany({
       where: {
-        userId,
-      },
-      select: {
-        name: true,
-        id: true,
-      },
-    });
-  }
-
-  async findOne(userId: string, categoryId: string): Promise<Category> {
-    return this.prismaService.category.findFirstOrThrow({
-      where: { userId, id: categoryId },
-    });
-  }
-
-  async update(
-    userId: string,
-    { id, ...data }: UpdateCategoryInput
-  ): Promise<Category> {
-    const { categories } = await this.prismaService.user.update({
-      where: { id: userId },
-      data: {
-        categories: {
-          update: {
-            where: { id },
-            data: {
-              ...data,
-              // updatedAt: new Date(),
-            },
-          },
-        },
+        budgetId,
       },
       include: {
-        categories: {
-          where: { id },
-        },
+        budgetItems: true,
       },
     });
-
-    if (categories.length < 1) {
-      throw new NotFoundException();
-    }
-
-    const updatedCategory = categories[0];
-
-    return { id: updatedCategory.id, name: updatedCategory.name };
   }
 
-  async remove({ userId, categoryId }: { userId: string; categoryId: string }) {
-    let categories: Category[];
+  async findOne(categoryId: string): Promise<Category> {
+    return this.prismaService.category.findFirstOrThrow({
+      where: { id: categoryId },
+      include: {
+        budgetItems: true,
+      },
+    });
+  }
+
+  async update({ id, ...data }: UpdateCategoryInput) {
+    return this.prismaService.category.update({
+      where: { id },
+      data: {
+        ...data,
+      },
+    });
+  }
+
+  async remove(categoryId: string) {
+    let category: Category;
 
     try {
-      const updatedUser = await this.prismaService.user.update({
-        where: { id: userId },
-        data: {
-          categories: {
-            delete: {
-              id: categoryId,
-            },
-          },
-        },
-        include: {
-          categories: {
-            where: { id: categoryId },
-          },
-        },
+      category = await this.prismaService.category.delete({
+        where: { id: categoryId },
       });
-
-      categories = updatedUser.categories;
     } catch (error) {
       console.error(error);
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2017'
-      ) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2017') {
         console.error(error.message);
-        throw new BadRequestException(
-          'The categoryId does not seem to be valid'
-        );
+        throw new BadRequestException('The categoryId does not seem to be valid');
       }
       return false;
     }
 
-    return categories.length === 0;
+    return category !== undefined;
+  }
+
+  async updateCurrentTotal(categoryId: string) {
+    const budgetItems = await this.prismaService.budgetItem.findMany({
+      where: { id: categoryId },
+    });
+
+    const budgetItemsTotal = budgetItems.reduce(
+      (accumulater, { amount }) => new BigNumber(amount).plus(accumulater),
+      new BigNumber(0)
+    );
+
+    return this.prismaService.category.update({
+      where: { id: categoryId },
+      data: {
+        currentAmount: budgetItemsTotal.toNumber(),
+      },
+    });
   }
 }

@@ -35,10 +35,4 @@ export class BudgetItem {
     description: 'Optional additional information for a budget item',
   })
   note?: string;
-
-  @Field()
-  createdAt: Date;
-
-  @Field()
-  updatedAt: Date;
 }

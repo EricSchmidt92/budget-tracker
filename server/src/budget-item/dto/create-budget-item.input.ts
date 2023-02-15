@@ -3,8 +3,8 @@ import { GraphQLUSCurrency } from 'graphql-scalars';
 
 @InputType()
 export class CreateBudgetItemInput {
-  @Field()
-  budgetId: string;
+  @Field({ nullable: true })
+  categoryId: string;
 
   @Field()
   name: string;
@@ -23,7 +23,4 @@ export class CreateBudgetItemInput {
 
   @Field({ nullable: true })
   note?: string;
-
-  @Field({ nullable: true })
-  categoryId?: string;
 }

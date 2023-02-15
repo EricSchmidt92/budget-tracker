@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Budget, Prisma } from '@prisma/client';
 import BigNumber from 'bignumber.js';
-import { User } from 'src/auth/users/models/user.model';
 import { PrismaService } from 'src/prisma.service';
 import { CreateBudgetInput } from './dto/create-budget.input';
 import { UpdateBudgetInput } from './dto/update-budget.input';
-import { Budget } from './models/budget.model';
 
 const budgetFullInclude = Prisma.validator<Prisma.BudgetInclude>()({
   categories: {
@@ -19,7 +17,7 @@ const budgetFullInclude = Prisma.validator<Prisma.BudgetInclude>()({
 export class BudgetService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(userId: string, createBudgetInput: CreateBudgetInput) {
+  create(userId: string, createBudgetInput: CreateBudgetInput): Promise<Budget> {
     return this.prismaService.budget.create({
       data: {
         ...createBudgetInput,
@@ -28,18 +26,18 @@ export class BudgetService {
     });
   }
 
-  findAll(userId: string): Promise<Budget[]> {
+  findAll(userId: string) {
     return this.prismaService.budget.findMany({
       where: { userId },
       include: { ...budgetFullInclude },
     });
   }
 
-  findOne(user: User, budgetId: string): Promise<Budget> {
+  findOne(userId: string, budgetId: string) {
     return this.prismaService.budget.findFirstOrThrow({
       where: {
         id: budgetId,
-        user,
+        userId,
       },
       include: {
         ...budgetFullInclude,
@@ -61,8 +59,7 @@ export class BudgetService {
     });
 
     const categoriesTotal = categories.reduce(
-      (accumulator, category) =>
-        new BigNumber(category.currentAmount).plus(accumulator),
+      (accumulator, category) => new BigNumber(category.currentAmount).plus(accumulator),
       new BigNumber(0)
     );
 
