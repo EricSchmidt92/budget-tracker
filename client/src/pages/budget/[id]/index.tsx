@@ -1,10 +1,11 @@
-import BudgetItem from "@/components/BudgetItem/BudgetItem";
+import Category from "@/components/Category/Category";
 import { graphql } from "@/gql";
 import { useQuery } from "@apollo/client";
-import { Box, Stack, Text, Title, useMantineTheme } from "@mantine/core";
+import { Accordion, Box, Button, Group, Stack, Text, Title } from "@mantine/core";
 import accounting from "accounting";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
+import { CirclePlus } from "tabler-icons-react";
 
 const GET_BUDGET = graphql(`
   query Budget($budgetId: String!) {
@@ -36,7 +37,6 @@ const GET_BUDGET = graphql(`
 const BudgetPage: NextPage = () => {
   const { query } = useRouter();
   const budgetId = query.id as string;
-  const { primaryColor } = useMantineTheme();
   const { data, error, loading } = useQuery(GET_BUDGET, {
     variables: {
       budgetId,
@@ -51,11 +51,7 @@ const BudgetPage: NextPage = () => {
     );
   }
 
-  if (loading) {
-    return <Title>Loading</Title>;
-  }
-
-  if (!data) {
+  if (loading || !data) {
     return <Title>Loading</Title>;
   }
 
@@ -66,26 +62,26 @@ const BudgetPage: NextPage = () => {
   const currentAmountColor = accounting.unformat(currentAmount) > accounting.unformat(maxAmount) ? "red" : "green";
 
   return (
-    <Box w="100%" h="100%">
-      <Title color={primaryColor} order={1} align="center">
-        {name} -{" "}
-        <Text component="span" color={currentAmountColor}>
-          {currentAmount}
-        </Text>{" "}
-        / {maxAmount}
-      </Title>
+    <Box w="90%" h="100%" mx="auto">
+      <Group position="apart">
+        <Title order={1}>
+          {name} -{" "}
+          <Text component="span" color={currentAmountColor}>
+            {currentAmount}
+          </Text>{" "}
+          / {maxAmount}
+        </Title>
+        <Button leftIcon={<CirclePlus strokeWidth={1.5} />}>Add New Category</Button>
+      </Group>
 
-      <Stack w="60%" mx="auto">
-        {categories.map(({ name, id, budgetItems }) => (
-          <>
-            <Title order={2} key={id}>
-              {name}
-            </Title>
-            {budgetItems.map((budgetItem) => (
-              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} />
-            ))}
-          </>
-        ))}
+      <Stack w="60%" mt="xl">
+        <Accordion variant="separated">
+          {categories.map((category) => (
+            <>
+              <Category key={category.id} category={category} />
+            </>
+          ))}
+        </Accordion>
       </Stack>
     </Box>
   );

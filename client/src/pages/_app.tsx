@@ -1,32 +1,20 @@
 import Guard from "@/components/Guard";
 import NavbarHeader from "@/components/NavbarHeader";
-import NavbarMinimal from "@/components/NavbarMinimal";
 import client from "@/constants/apollo-client";
-import "@/styles/globals.css";
 import { ApolloProvider } from "@apollo/client";
-import {
-  AppShell,
-  ColorScheme,
-  ColorSchemeProvider,
-  MantineProvider,
-} from "@mantine/core";
+import { AppShell, ColorScheme, ColorSchemeProvider, MantineProvider } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import { getCookie, setCookie } from "cookies-next";
 import NextApp, { AppContext, AppProps } from "next/app";
 import { useState } from "react";
 
-export default function App({
-  Component,
-  pageProps,
-  ...props
-}: AppProps & { colorScheme: ColorScheme }) {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>(
-    props.colorScheme
-  );
+//TODO: look into root provider...that provides providers
+
+export default function App({ Component, pageProps, ...props }: AppProps & { colorScheme: ColorScheme }) {
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
 
   const toggleColorScheme = (value?: ColorScheme) => {
-    const nextColorScheme =
-      value || (colorScheme === "dark" ? "light" : "dark");
+    const nextColorScheme = value || (colorScheme === "dark" ? "light" : "dark");
     setColorScheme(nextColorScheme);
     setCookie("mantine-color-scheme", nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,
@@ -34,10 +22,7 @@ export default function App({
   };
   return (
     <ApolloProvider client={client}>
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      >
+      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
@@ -48,7 +33,7 @@ export default function App({
         >
           <NotificationsProvider>
             <Guard excludedRoutes={["/login", "/signup"]}>
-              <AppShell navbar={<NavbarMinimal />} header={<NavbarHeader />}>
+              <AppShell header={<NavbarHeader />}>
                 <Component {...pageProps} />
               </AppShell>
             </Guard>

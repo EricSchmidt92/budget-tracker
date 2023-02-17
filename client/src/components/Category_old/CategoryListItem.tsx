@@ -1,5 +1,5 @@
 import { graphql } from "@/gql";
-import { GET_CATEGORIES } from "@/components/Category/category";
+import { GET_CATEGORIES } from "@/components/Category_old/category";
 import { useMutation } from "@apollo/client";
 import { ActionIcon, Group, Text } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";

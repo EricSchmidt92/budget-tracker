@@ -6,6 +6,9 @@ import React from "react";
 import { showNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { GET_BUDGETS } from "@/pages/index";
+import accounting from "accounting";
+import { USCurrency } from "graphql-scalars/typings/typeDefs";
+import { USCurrencyResolver } from "graphql-scalars";
 
 export const CREATE_BUDGET = graphql(`
   mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {
@@ -32,10 +35,12 @@ const CreateBudget = () => {
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
+      const maxAmount = accounting.formatMoney(values.maxAmount) as "USCurrency";
       await createBudget({
         variables: {
           createBudgetInput: {
             ...values,
+            maxAmount,
           },
         },
         refetchQueries: [{ query: GET_BUDGETS }],
