@@ -1,13 +1,16 @@
 import { graphql } from "@/gql";
+import { GET_BUDGET } from "@/pages/budget/[id]";
 import { Currency } from "@/types";
 import { useMutation } from "@apollo/client";
-import { Box, Group, TextInput } from "@mantine/core";
+import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
-import React from "react";
 
 interface CategoryFormProps {
   budgetId: string;
+  close: () => void;
+  opened: boolean;
 }
 
 const CREATE_CATEGORY = graphql(`
@@ -21,7 +24,7 @@ const CREATE_CATEGORY = graphql(`
   }
 `);
 
-const CategoryCreateForm = ({ budgetId }: CategoryFormProps) => {
+const CategoryCreateForm = ({ budgetId, opened, close }: CategoryFormProps) => {
   const [createCategory] = useMutation(CREATE_CATEGORY);
   const form = useForm({
     initialValues: {
@@ -31,9 +34,8 @@ const CategoryCreateForm = ({ budgetId }: CategoryFormProps) => {
   });
 
   const handleAddCategory = async ({ name, maxAmount }: typeof form.values) => {
-    console.log("you called the handleAddCategory function with the values of: ", [name, maxAmount]);
-
     const parsedMaxAmount = accounting.formatMoney(maxAmount) as Currency;
+
     await createCategory({
       variables: {
         createCategoryInput: {
@@ -42,13 +44,36 @@ const CategoryCreateForm = ({ budgetId }: CategoryFormProps) => {
           maxAmount: parsedMaxAmount,
         },
       },
+
+      onCompleted: ({ createCategory: { name } }) => {
+        showNotification({
+          title: "Success",
+          message: `${name} Category created`,
+        });
+        handleOnClose();
+      },
+
+      onError: (error) => {
+        showNotification({
+          title: error.name,
+          message: error.message,
+          color: "red",
+        });
+      },
+
+      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
     });
   };
 
+  const handleOnClose = () => {
+    form.reset();
+    close();
+  };
+
   return (
-    <Box>
+    <Modal opened={opened} onClose={handleOnClose} size="md" title="Enter New Category">
       <form onSubmit={form.onSubmit((values) => handleAddCategory(values))}>
-        <Group>
+        <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Utilities" {...form.getInputProps("name")} />
           <TextInput
             withAsterisk
@@ -57,9 +82,10 @@ const CategoryCreateForm = ({ budgetId }: CategoryFormProps) => {
             type="number"
             {...form.getInputProps("maxAmount")}
           />
-        </Group>
+          <Button type="submit">Create Category</Button>
+        </Stack>
       </form>
-    </Box>
+    </Modal>
   );
 };
 

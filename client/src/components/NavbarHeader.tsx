@@ -2,9 +2,9 @@ import authenticatedVar from "@/constants/authenticated";
 import useGetMe from "@/hooks/useGetMe";
 import { useLogout } from "@/hooks/useLogout";
 import { useReactiveVar } from "@apollo/client";
-import { Button, Group, Header, Text, Tooltip } from "@mantine/core";
+import { Button, Group, Header, Text } from "@mantine/core";
 import { useRouter } from "next/router";
-import { CirclePlus, Login, Logout, ReportMoney } from "tabler-icons-react";
+import { Login, Logout, Plus, ReportMoney } from "tabler-icons-react";
 import { ColorSchemeToggle } from "./ColorSchemeToggle/ColorSchemeToggle";
 
 const NavbarHeader = () => {
@@ -49,7 +49,7 @@ const NavbarHeader = () => {
           <Button
             color="primary"
             variant="light"
-            leftIcon={<CirclePlus strokeWidth={1.5} />}
+            leftIcon={<Plus strokeWidth={1.5} />}
             onClick={() => router.push("/budget/create")}
           >
             Add Budget
