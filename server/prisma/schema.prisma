@@ -29,7 +29,7 @@ model Budget {
   createdAt     DateTime @default(now())
 
   categories Category[]
-  user       User       @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
 }
 
@@ -42,7 +42,7 @@ model Category {
   updatedAt     DateTime @updatedAt
 
   budgetItems BudgetItem[]
-  Budget      Budget       @relation(fields: [budgetId], references: [id])
+  Budget      Budget       @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   budgetId    String
   user        User         @relation(fields: [userId], references: [id])
   userId      String
@@ -59,7 +59,7 @@ model BudgetItem {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId String
   User       User     @relation(fields: [userId], references: [id])
   userId     String

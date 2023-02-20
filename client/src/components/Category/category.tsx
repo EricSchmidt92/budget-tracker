@@ -2,6 +2,8 @@ import { graphql } from "@/gql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { useMutation } from "@apollo/client";
 import { Accordion, Box, Text } from "@mantine/core";
+import { openConfirmModal } from "@mantine/modals";
+import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
 import CategoryMenu from "./CategoryMenu";
 import { CategoryProps, MenuAction, MenuItemSelectProps } from "./types";
@@ -13,14 +15,35 @@ const DELETE_CATEGORY = graphql(`
 `);
 
 const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id }, budgetId }: CategoryProps) => {
-  const [removeCategory] = useMutation(DELETE_CATEGORY);
+  const [removeCategoryMutation] = useMutation(DELETE_CATEGORY);
   const currentAmountColor = accounting.unformat(currentAmount) > accounting.unformat(maxAmount) ? "red" : "green";
 
   const handleDeleteCategory = async () => {
-    await removeCategory({
+    openConfirmModal({
+      title: "Confirm delete category",
+      children: <Text>Deleting a category will delete all budget items associated with it. Are you sure?</Text>,
+      labels: { cancel: "Cancel", confirm: "Confirm" },
+      onConfirm: () => removeCategory(),
+    });
+  };
+
+  const removeCategory = async () => {
+    await removeCategoryMutation({
       variables: {
         removeCategoryId: id,
       },
+
+      onCompleted: () =>
+        showNotification({
+          title: "Success",
+          message: "Category successfully deleted",
+        }),
+
+      onError: ({ name, message }) =>
+        showNotification({
+          title: `Error deleting category: ${name}`,
+          message: message,
+        }),
       refetchQueries: [{ query: GET_BUDGET, variables: { budgetId: budgetId } }],
     });
   };

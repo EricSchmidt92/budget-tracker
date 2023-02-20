@@ -3,6 +3,7 @@ import NavbarHeader from "@/components/NavbarHeader";
 import client from "@/constants/apollo-client";
 import { ApolloProvider } from "@apollo/client";
 import { AppShell, ColorScheme, ColorSchemeProvider, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
 import { getCookie, setCookie } from "cookies-next";
 import NextApp, { AppContext, AppProps } from "next/app";
@@ -32,11 +33,13 @@ export default function App({ Component, pageProps, ...props }: AppProps & { col
           }}
         >
           <NotificationsProvider>
-            <Guard excludedRoutes={["/login", "/signup"]}>
-              <AppShell header={<NavbarHeader />}>
-                <Component {...pageProps} />
-              </AppShell>
-            </Guard>
+            <ModalsProvider>
+              <Guard excludedRoutes={["/login", "/signup"]}>
+                <AppShell header={<NavbarHeader />}>
+                  <Component {...pageProps} />
+                </AppShell>
+              </Guard>
+            </ModalsProvider>
           </NotificationsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
