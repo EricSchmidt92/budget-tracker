@@ -1,12 +1,26 @@
 import { graphql } from "@/gql";
+import { Category as TCategory } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { useMutation } from "@apollo/client";
 import { Accordion, Box, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
+import CategoryFormModal from "./CategoryFormModal";
 import CategoryMenu from "./CategoryMenu";
-import { CategoryProps, MenuAction, MenuItemSelectProps } from "./types";
+
+export interface CategoryProps {
+  category: TCategory;
+  budgetId: string;
+  open?: () => void;
+}
+
+export enum MenuAction {
+  ADD_ITEM = `Add Item`,
+  EDIT_CATEGORY = "Edit Category",
+  DELETE_CATEGORY = "Delete Category",
+}
 
 const DELETE_CATEGORY = graphql(`
   mutation RemoveCategory($removeCategoryId: String!) {
@@ -15,6 +29,7 @@ const DELETE_CATEGORY = graphql(`
 `);
 
 const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id }, budgetId }: CategoryProps) => {
+  const [opened, { close, open }] = useDisclosure(false);
   const [removeCategoryMutation] = useMutation(DELETE_CATEGORY);
   const currentAmountColor = accounting.unformat(currentAmount) > accounting.unformat(maxAmount) ? "red" : "green";
 
@@ -48,16 +63,14 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
     });
   };
 
-  const handleMenuItemSelect = (props: MenuItemSelectProps) => {
-    const { action } = props;
-
+  const handleMenuItemSelect = (action: MenuAction) => {
     switch (action) {
       case MenuAction.ADD_ITEM:
         console.log("add selected, not yet implemented");
         break;
 
       case MenuAction.EDIT_CATEGORY:
-        console.log("trying to edit category...not yet implemented");
+        open();
         break;
 
       case MenuAction.DELETE_CATEGORY:
@@ -67,29 +80,41 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
   };
 
   return (
-    <Accordion.Item value={name} pr="sm" key={id}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Accordion.Control>
-          <Text>
-            {name} -{" "}
-            <Text component="span" color={currentAmountColor}>
-              {currentAmount}
-            </Text>{" "}
-            / {maxAmount}
-          </Text>
-        </Accordion.Control>
+    <>
+      <Accordion.Item value={name} pr="sm" key={id}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Accordion.Control>
+            <Text>
+              {name} -{" "}
+              <Text component="span" color={currentAmountColor}>
+                {currentAmount}
+              </Text>{" "}
+              / {maxAmount}
+            </Text>
+          </Accordion.Control>
 
-        <CategoryMenu onItemSelect={handleMenuItemSelect} />
-      </Box>
+          <CategoryMenu onItemSelect={handleMenuItemSelect} />
+        </Box>
 
-      <Accordion.Panel>
-        {budgetItems.map((item) => (
-          <Text key={item.id}>
-            {item.name} - {item.amount}
-          </Text>
-        ))}
-      </Accordion.Panel>
-    </Accordion.Item>
+        <Accordion.Panel>
+          {budgetItems.map((item) => (
+            <Text key={item.id}>
+              {item.name} - {item.amount}
+            </Text>
+          ))}
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <CategoryFormModal
+        budgetId={budgetId}
+        close={close}
+        opened={opened}
+        values={{
+          categoryId: id,
+          initialValues: { maxAmount: accounting.unformat(maxAmount), name },
+        }}
+      />
+    </>
   );
 };
 

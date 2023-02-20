@@ -1,5 +1,5 @@
 import Category from "@/components/Category/Category";
-import CategoryCreateForm from "@/components/Category/CategoryCreateForm";
+import CategoryFormModal from "@/components/Category/CategoryFormModal";
 import { graphql } from "@/gql";
 import { useQuery } from "@apollo/client";
 import { Accordion, Box, Button, Group, Stack, Text, Title } from "@mantine/core";
@@ -86,7 +86,7 @@ const BudgetPage: NextPage = () => {
           ))}
         </Accordion>
       </Stack>
-      <CategoryCreateForm opened={opened} close={close} budgetId={id} />
+      <CategoryFormModal opened={opened} close={close} budgetId={id} />
     </Box>
   );
 };

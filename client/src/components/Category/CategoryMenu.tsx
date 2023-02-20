@@ -1,11 +1,10 @@
 import { RemoveCategoryMutationVariables, CreateBudgetItemInput } from "@/gql/graphql";
 import { ActionIcon, Menu } from "@mantine/core";
 import { Dots, Edit, Plus, Trash } from "tabler-icons-react";
-
-import { MenuAction, MenuItemSelectProps } from "./types";
+import { MenuAction } from "./Category";
 
 interface CategoryMenuProps {
-  onItemSelect: (props: MenuItemSelectProps) => void;
+  onItemSelect: (props: MenuAction) => void;
 }
 
 const CategoryMenu = ({ onItemSelect }: CategoryMenuProps) => {
@@ -29,7 +28,7 @@ const CategoryMenu = ({ onItemSelect }: CategoryMenuProps) => {
         <Menu.Item
           icon={<Edit size={18} strokeWidth={1.5} />}
           color="yellow.4"
-          onClick={() => console.log("edit category selected...to be implemented.....")}
+          onClick={() => onItemSelect(MenuAction.EDIT_CATEGORY)}
         >
           Edit Category
         </Menu.Item>
@@ -37,7 +36,7 @@ const CategoryMenu = ({ onItemSelect }: CategoryMenuProps) => {
         <Menu.Item
           icon={<Trash size={18} strokeWidth={1.5} />}
           color="red"
-          onClick={() => onItemSelect({ action: MenuAction.DELETE_CATEGORY })}
+          onClick={() => onItemSelect(MenuAction.DELETE_CATEGORY)}
         >
           Delete Category
         </Menu.Item>
