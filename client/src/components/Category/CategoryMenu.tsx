@@ -20,7 +20,7 @@ const CategoryMenu = ({ onItemSelect }: CategoryMenuProps) => {
         <Menu.Item
           icon={<Plus size={18} strokeWidth={1.5} />}
           color="green"
-          onClick={() => console.log("add item selected....to be implemented")}
+          onClick={() => onItemSelect(MenuAction.ADD_ITEM)}
         >
           Add Budget Item
         </Menu.Item>

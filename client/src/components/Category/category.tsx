@@ -7,13 +7,13 @@ import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
+import BudgetItemFormModal from "../BudgetItem/BudgetItemFormModal";
 import CategoryFormModal from "./CategoryFormModal";
 import CategoryMenu from "./CategoryMenu";
 
 export interface CategoryProps {
   category: TCategory;
   budgetId: string;
-  open?: () => void;
 }
 
 export enum MenuAction {
@@ -29,7 +29,8 @@ const DELETE_CATEGORY = graphql(`
 `);
 
 const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id }, budgetId }: CategoryProps) => {
-  const [opened, { close, open }] = useDisclosure(false);
+  const [categoryOpened, { close: closeCategory, open: openCategory }] = useDisclosure(false);
+  const [budgetItemOpened, { close: closeBudgetItem, open: openBudgetItem }] = useDisclosure(false);
   const [removeCategoryMutation] = useMutation(DELETE_CATEGORY);
   const currentAmountColor = accounting.unformat(currentAmount) > accounting.unformat(maxAmount) ? "red" : "green";
 
@@ -66,11 +67,11 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
   const handleMenuItemSelect = (action: MenuAction) => {
     switch (action) {
       case MenuAction.ADD_ITEM:
-        console.log("add selected, not yet implemented");
+        openBudgetItem();
         break;
 
       case MenuAction.EDIT_CATEGORY:
-        open();
+        openCategory();
         break;
 
       case MenuAction.DELETE_CATEGORY:
@@ -107,13 +108,15 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
 
       <CategoryFormModal
         budgetId={budgetId}
-        close={close}
-        opened={opened}
+        close={closeCategory}
+        opened={categoryOpened}
         values={{
           categoryId: id,
           initialValues: { maxAmount: accounting.unformat(maxAmount), name },
         }}
       />
+
+      <BudgetItemFormModal categoryId={id} close={closeBudgetItem} opened={budgetItemOpened} />
     </>
   );
 };

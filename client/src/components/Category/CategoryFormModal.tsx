@@ -16,7 +16,10 @@ interface CategoryFormProps {
   budgetId: string;
   close: () => void;
   opened: boolean;
-  values?: { categoryId: string; initialValues: CategoryFormValues };
+  values?: {
+    categoryId: string;
+    initialValues: CategoryFormValues;
+  };
 }
 
 interface UpdateCategoryProps {
@@ -47,6 +50,7 @@ const UPDATE_CATEGORY = graphql(`
 const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProps) => {
   const [createCategory] = useMutation(CREATE_CATEGORY);
   const [updateCategory] = useMutation(UPDATE_CATEGORY);
+  const operation = values !== undefined ? "Update" : "Create";
 
   const initialValues = values ? values.initialValues : { maxAmount: 0, name: "" };
 
@@ -77,6 +81,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
       onCompleted: ({ updateCategory: { name } }) => {
         handleSuccess(`${name} Category updated`);
         handleOnClose();
+        form.reset();
       },
       onError: handleError,
       refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
@@ -124,7 +129,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
   };
 
   return (
-    <Modal opened={opened} onClose={handleOnClose} size="md" title="Enter New Category">
+    <Modal opened={opened} onClose={handleOnClose} size="md" title={`${operation} Category`}>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Utilities" {...form.getInputProps("name")} />
@@ -135,7 +140,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
             type="number"
             {...form.getInputProps("maxAmount")}
           />
-          <Button type="submit">Create Category</Button>
+          <Button type="submit">{operation}</Button>
         </Stack>
       </form>
     </Modal>
