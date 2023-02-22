@@ -58,12 +58,19 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
     initialValues,
   });
 
-  const handleSubmit = (formValues: CategoryFormValues) => {
-    if (values !== undefined) {
-      return handleUpdateCategory({ formValues, categoryId: values.categoryId });
-    }
+  const handleSuccess = (message: string) => {
+    showNotification({
+      title: "Success",
+      message,
+    });
+  };
 
-    return handleAddCategory(formValues);
+  const handleError = (error: ApolloError) => {
+    showNotification({
+      title: error.name,
+      message: error.message,
+      color: "red",
+    });
   };
 
   const handleUpdateCategory = async ({ formValues: { name, maxAmount }, categoryId }: UpdateCategoryProps) => {
@@ -108,24 +115,17 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
     });
   };
 
-  const handleSuccess = (message: string) => {
-    showNotification({
-      title: "Success",
-      message,
-    });
-  };
-
-  const handleError = (error: ApolloError) => {
-    showNotification({
-      title: error.name,
-      message: error.message,
-      color: "red",
-    });
-  };
-
   const handleOnClose = () => {
     form.reset();
     close();
+  };
+
+  const handleSubmit = (formValues: CategoryFormValues) => {
+    if (values !== undefined) {
+      return handleUpdateCategory({ formValues, categoryId: values.categoryId });
+    }
+
+    return handleAddCategory(formValues);
   };
 
   return (

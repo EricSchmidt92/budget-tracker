@@ -116,7 +116,7 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
         }}
       />
 
-      <BudgetItemFormModal categoryId={id} close={closeBudgetItem} opened={budgetItemOpened} />
+      <BudgetItemFormModal budgetId={budgetId} categoryId={id} close={closeBudgetItem} opened={budgetItemOpened} />
     </>
   );
 };

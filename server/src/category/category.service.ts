@@ -69,7 +69,7 @@ export class CategoryService {
 
   async updateCurrentTotal(categoryId: string) {
     const budgetItems = await this.prismaService.budgetItem.findMany({
-      where: { id: categoryId },
+      where: { categoryId: categoryId },
     });
 
     const budgetItemsTotal = budgetItems.reduce(

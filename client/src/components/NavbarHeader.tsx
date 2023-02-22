@@ -13,6 +13,7 @@ const NavbarHeader = () => {
   const { data: user } = useGetMe();
   const { logout } = useLogout();
   const authIcon = authenticated ? <Logout strokeWidth={1.5} /> : <Login strokeWidth={1.5} />;
+  const authText = authenticated ? "Logout" : "Login";
 
   const handleAuthButtonClick = async () => (user ? await logout() : null);
 
@@ -56,7 +57,7 @@ const NavbarHeader = () => {
           </Button>
 
           <Button variant="light" leftIcon={authIcon} onClick={handleAuthButtonClick}>
-            Logout
+            {authText}
           </Button>
         </Group>
       </Group>

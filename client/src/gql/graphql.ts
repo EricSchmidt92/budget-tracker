@@ -73,7 +73,7 @@ export type CreateBudgetInput = {
 
 export type CreateBudgetItemInput = {
   amount: Scalars['USCurrency'];
-  categoryId?: InputMaybe<Scalars['String']>;
+  categoryId: Scalars['String'];
   dueDate?: InputMaybe<Scalars['DateTime']>;
   name: Scalars['String'];
   note?: InputMaybe<Scalars['String']>;
@@ -177,6 +177,13 @@ export type User = {
   id: Scalars['ID'];
 };
 
+export type CreateBudgetItemMutationVariables = Exact<{
+  createBudgetItemInput: CreateBudgetItemInput;
+}>;
+
+
+export type CreateBudgetItemMutation = { __typename?: 'Mutation', createBudgetItem: { __typename?: 'BudgetItem', id: string, name: string } };
+
 export type RemoveCategoryMutationVariables = Exact<{
   removeCategoryId: Scalars['String'];
 }>;
@@ -230,6 +237,7 @@ export type BudgetsQueryVariables = Exact<{ [key: string]: never; }>;
 export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, maxAmount: "USCurrency", description?: string | null, name: string }> };
 
 
+export const CreateBudgetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateBudgetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetItemInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateBudgetItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createBudgetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createBudgetItemInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetItemInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateBudgetItemMutation, CreateBudgetItemMutationVariables>;
 export const RemoveCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}}}]}]}}]} as unknown as DocumentNode<RemoveCategoryMutation, RemoveCategoryMutationVariables>;
 export const CreateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateCategoryMutation, CreateCategoryMutationVariables>;
 export const UpdateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"updateCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"updateCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
@@ -305,7 +313,7 @@ export type CreateBudgetInput = {
 
 export type CreateBudgetItemInput = {
   amount: Scalars['USCurrency'];
-  categoryId?: InputMaybe<Scalars['String']>;
+  categoryId: Scalars['String'];
   dueDate?: InputMaybe<Scalars['DateTime']>;
   name: Scalars['String'];
   note?: InputMaybe<Scalars['String']>;
