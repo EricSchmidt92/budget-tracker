@@ -1,5 +1,4 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
-import { USCurrencyResolver } from "graphql-scalars";
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -8,17 +7,11 @@ const config: CodegenConfig = {
   generates: {
     "./src/gql/": {
       preset: "client",
-      plugins: [
-        {
-          add: {
-            content: "import { USCurrencyResolver } from 'graphql-scalars';",
-          },
-        },
-        "typescript",
-      ],
+      plugins: [],
       config: {
         scalars: {
-          USCurrency: USCurrencyResolver,
+          USCurrency: "string",
+          DateTime: "string",
         },
       },
     },

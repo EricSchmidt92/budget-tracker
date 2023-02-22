@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 import { GraphQLUSCurrency } from 'graphql-scalars';
 
 @ObjectType()
@@ -9,19 +9,19 @@ export class BudgetItem {
   @Field({ description: 'Name for the budget item (e.g. "Target run") ' })
   name: string;
 
-  @Field((type) => GraphQLUSCurrency, {
+  @Field(() => GraphQLUSCurrency, {
     description: 'The amount of the budget item in pennies',
   })
   amount: number;
 
-  @Field({
+  @Field(() => GraphQLISODateTime, {
     nullable: true,
     description:
       'Optional due date for a budget item. Due date and paid date are useful for things such as a utility bill',
   })
   dueDate?: Date;
 
-  @Field({
+  @Field(() => GraphQLISODateTime, {
     nullable: true,
     description: 'Optional date for when a budget item is paid.',
   })

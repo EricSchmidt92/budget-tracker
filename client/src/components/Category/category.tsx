@@ -2,11 +2,13 @@ import { graphql } from "@/gql";
 import { Category as TCategory } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { useMutation } from "@apollo/client";
-import { Accordion, Box, Text } from "@mantine/core";
+import { Accordion, Box, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
+import { ArrowUpSquare, ChevronsUp, Plus, SquareArrowUp } from "tabler-icons-react";
+import BudgetItem from "../BudgetItem/BudgetItem";
 import BudgetItemFormModal from "../BudgetItem/BudgetItemFormModal";
 import CategoryFormModal from "./CategoryFormModal";
 import CategoryMenu from "./CategoryMenu";
@@ -82,10 +84,10 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
 
   return (
     <>
-      <Accordion.Item value={name} pr="sm" key={id}>
+      <Accordion.Item value={id} pr="sm">
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Accordion.Control>
-            <Text>
+            <Text size="lg" weight={500}>
               {name} -{" "}
               <Text component="span" color={currentAmountColor}>
                 {currentAmount}
@@ -98,11 +100,11 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
         </Box>
 
         <Accordion.Panel>
-          {budgetItems.map((item) => (
-            <Text key={item.id}>
-              {item.name} - {item.amount}
-            </Text>
-          ))}
+          <Accordion variant="separated" chevron={<ChevronsUp strokeWidth={1.5} />}>
+            {budgetItems.map((budgetItem) => (
+              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} />
+            ))}
+          </Accordion>
         </Accordion.Panel>
       </Accordion.Item>
 
