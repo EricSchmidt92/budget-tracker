@@ -2,21 +2,26 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import BigNumber from 'bignumber.js';
+import { BudgetService } from 'src/budget/budget.service';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService, private readonly budgetService: BudgetService) {}
 
-  create(userId: string, createCategoryInput: CreateCategoryInput): Promise<Category> {
-    return this.prismaService.category.create({
+  async create(userId: string, createCategoryInput: CreateCategoryInput): Promise<Category> {
+    const category = await this.prismaService.category.create({
       data: {
         ...createCategoryInput,
         userId,
       },
     });
+
+    // await this.budgetService.updateCurrentTotal(createCategoryInput.budgetId);
+
+    return category;
   }
 
   findAll(budgetId: string): Promise<Category[]> {
@@ -55,6 +60,8 @@ export class CategoryService {
       category = await this.prismaService.category.delete({
         where: { id: categoryId },
       });
+
+      await this.budgetService.updateCurrentTotal(category.budgetId);
     } catch (error) {
       console.error(error);
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2017') {
@@ -77,11 +84,15 @@ export class CategoryService {
       new BigNumber(0)
     );
 
-    return this.prismaService.category.update({
+    const updatedCategory = await this.prismaService.category.update({
       where: { id: categoryId },
       data: {
         currentAmount: budgetItemsTotal.toNumber(),
       },
     });
+
+    await this.budgetService.updateCurrentTotal(updatedCategory.budgetId);
+
+    return updatedCategory;
   }
 }

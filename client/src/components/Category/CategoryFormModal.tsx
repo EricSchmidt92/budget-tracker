@@ -74,7 +74,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
   };
 
   const handleUpdateCategory = async ({ formValues: { name, maxAmount }, categoryId }: UpdateCategoryProps) => {
-    const parsedMaxAmount = accounting.formatMoney(maxAmount) as Currency;
+    const parsedMaxAmount = accounting.formatMoney(maxAmount);
 
     await updateCategory({
       variables: {
@@ -96,7 +96,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
   };
 
   const handleAddCategory = async ({ name, maxAmount }: CategoryFormValues) => {
-    const parsedMaxAmount = accounting.formatMoney(maxAmount) as Currency;
+    const parsedMaxAmount = accounting.formatMoney(maxAmount);
 
     await createCategory({
       variables: {

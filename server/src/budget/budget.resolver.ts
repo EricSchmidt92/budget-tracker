@@ -31,7 +31,7 @@ export class BudgetResolver {
     return this.budgetService.findOne(userId, id);
   }
 
-  //TODO: these are not yet implemented...
+  // these are not yet implemented...
   // @Mutation(() => Budget)
   // updateBudget(@Args('updateBudgetInput') updateBudgetInput: UpdateBudgetInput) {
   //   return this.budgetService.update(updateBudgetInput.id, updateBudgetInput);
@@ -42,7 +42,6 @@ export class BudgetResolver {
   //   return this.budgetService.remove(id);
   // }
 
-  //TODO: add in categoryResolver to resolve the Category fields for budget
   @ResolveField('categories', () => [Category])
   async categories(@CurrentUser() user: User, @Parent() { id: budgetId }: Budget) {
     return this.categoryResolver.findAll(user, budgetId);

@@ -6,16 +6,6 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateBudgetItemInput } from './dto/create-budget-item.input';
 import { UpdateBudgetItemInput } from './dto/update-budget-item.input';
 
-const connect = (id?: string): { connect: { id: string } } | undefined => {
-  return id
-    ? {
-        connect: {
-          id,
-        },
-      }
-    : undefined;
-};
-
 @Injectable()
 export class BudgetItemService {
   constructor(private readonly prismaService: PrismaService, private readonly categoryService: CategoryService) {}
