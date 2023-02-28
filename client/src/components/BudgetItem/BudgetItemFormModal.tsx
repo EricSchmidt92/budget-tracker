@@ -1,21 +1,11 @@
 import { graphql } from "@/gql";
-import { CreateBudgetItemInput } from "@/gql/graphql";
+import { CreateBudgetItemInput, UpdateBudgetItemInput } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { ApolloError, useMutation } from "@apollo/client";
 import { Button, Checkbox, Modal, NumberInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
-
-interface BudgetItemFormValues {
-  name: string;
-  amount: number;
-  hasDueDate: boolean;
-  dueDate?: string;
-  paidDate?: string;
-  paid: boolean;
-  note?: string;
-}
 
 interface BudgetItemFormProps {
   budgetId: string;
@@ -27,11 +17,22 @@ interface BudgetItemFormProps {
     initialValues: BudgetItemFormValues;
   };
 }
-
-interface UpdateBudgetItemProps {
-  formValues: BudgetItemFormValues;
-  budgetItemId: string;
+interface BudgetItemFormValues {
+  name: string;
+  amount: number;
+  hasDueDate: boolean;
+  dueDate?: string;
+  paidDate?: string;
+  paid: boolean;
+  note?: string;
 }
+type Update = UpdateBudgetItemInput;
+type SubmitBudgetItemValues = Omit<CreateBudgetItemInput, "categoryId">;
+type BudgetItemSubmitProps<T extends string> = {
+  [K in `${T}Id`]: string;
+} & {
+  formValues: SubmitBudgetItemValues;
+};
 
 const CREATE_BUDGET_ITEM = graphql(`
   mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {
@@ -42,8 +43,18 @@ const CREATE_BUDGET_ITEM = graphql(`
   }
 `);
 
+const UPDATE_BUDGET_ITEM = graphql(`
+  mutation UpdateBudgetItem($updateBudgetItemInput: UpdateBudgetItemInput!) {
+    updateBudgetItem(updateBudgetItemInput: $updateBudgetItemInput) {
+      name
+      id
+    }
+  }
+`);
+
 const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: BudgetItemFormProps) => {
   const [createBudgetItem] = useMutation(CREATE_BUDGET_ITEM);
+  const [updateBudgetItem] = useMutation(UPDATE_BUDGET_ITEM);
   const operation = values !== undefined ? "Update" : "Create";
   const initialValues = values
     ? values.initialValues
@@ -59,16 +70,22 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
 
   const form = useForm<BudgetItemFormValues>({
     initialValues: {
-      note: "",
-      dueDate: new Date().toISOString().slice(0, 10),
-      paidDate: new Date().toISOString().slice(0, 10),
       ...initialValues,
+      note: "",
     },
   });
 
-  const handleOnClose = () => {
-    form.reset();
-    close();
+  const parseFormValues = (formValues: BudgetItemFormValues): SubmitBudgetItemValues => {
+    const { paid, hasDueDate, paidDate, dueDate, amount, note, name } = formValues;
+
+    return {
+      paid,
+      paidDate: paid ? paidDate : undefined,
+      dueDate: hasDueDate ? dueDate : undefined,
+      amount: accounting.formatMoney(amount),
+      note: note ? note : undefined,
+      name,
+    };
   };
 
   const handleSuccess = (message: string) => {
@@ -76,8 +93,6 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
       title: "Success",
       message,
     });
-
-    handleOnClose();
   };
 
   const handleError = (error: ApolloError) => {
@@ -86,55 +101,66 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
       message: error.message,
       color: "red",
     });
+
+    close();
   };
 
-  const handleAddBudgetItem = async (values: CreateBudgetItemInput) => {
+  const handleAddBudgetItem = async ({ categoryId, ...values }: CreateBudgetItemInput) => {
     await createBudgetItem({
       variables: {
         createBudgetItemInput: {
+          categoryId,
           ...values,
         },
       },
       onCompleted: ({ createBudgetItem: { name } }) => {
         handleSuccess(`${name} Budget item created`);
+        close();
+        form.reset();
       },
       onError: handleError,
       refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
     });
   };
 
-  const parseFormValues = (formValues: BudgetItemFormValues): CreateBudgetItemInput => {
-    const { paid, hasDueDate, paidDate, dueDate, amount, ...values } = formValues;
-    return {
-      paid,
-      paidDate: paid ? paidDate : null,
-      dueDate: hasDueDate ? dueDate : null,
-      amount: accounting.formatMoney(amount) as "USCurrency",
-      categoryId,
-      ...values,
-    };
+  const handleUpdateBudgetItem = async ({ id, ...values }: UpdateBudgetItemInput) => {
+    await updateBudgetItem({
+      variables: {
+        updateBudgetItemInput: {
+          id,
+          ...values,
+        },
+      },
+      onCompleted: ({ updateBudgetItem: { name } }) => {
+        handleSuccess(`${name} Budget Item updated`);
+        close();
+      },
+      onError: handleError,
+      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+    });
   };
 
   const handleSubmit = (formValues: BudgetItemFormValues) => {
-    console.log("Submitted the form with values: ");
-    console.table(formValues);
     const parsedValues = parseFormValues(formValues);
-    console.table(parsedValues);
 
     if (values) {
-      console.log("attempting to update a budget item...implement me!");
+      return handleUpdateBudgetItem({ ...parsedValues, id: values.budgetItemId });
     }
 
-    handleAddBudgetItem(parsedValues);
+    return handleAddBudgetItem({ ...parsedValues, categoryId });
   };
 
   return (
-    <Modal opened={opened} onClose={handleOnClose} size="md" title={`${operation} Budget Item`}>
+    <Modal opened={opened} onClose={close} size="md" title={`${operation} Budget Item`}>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Target Shopping Trip" {...form.getInputProps("name")} />
           <NumberInput withAsterisk label="Amount" type="number" {...form.getInputProps("amount")} />
-          <Checkbox label="Does this Item have a due date?" {...form.getInputProps("hasDueDate")} />
+          <Checkbox
+            label="Does this Item have a due date?"
+            checked={initialValues.hasDueDate}
+            {...form.getInputProps("hasDueDate")}
+          />
           {form.values.hasDueDate && (
             <TextInput
               label="Due Date"
@@ -143,7 +169,11 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
               {...form.getInputProps("dueDate")}
             />
           )}
-          <Checkbox label="Have you paid this item off yet?" {...form.getInputProps("paid")} />
+          <Checkbox
+            label="Have you paid this item off yet?"
+            checked={initialValues.paid}
+            {...form.getInputProps("paid")}
+          />
           {form.values.paid && (
             <TextInput
               label="Paid Date"

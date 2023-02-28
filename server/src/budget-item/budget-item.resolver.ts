@@ -8,6 +8,7 @@ import { CategoryService } from 'src/category/category.service';
 import { AuthorizeProps } from 'types';
 import { BudgetItemService } from './budget-item.service';
 import { CreateBudgetItemInput } from './dto/create-budget-item.input';
+import { UpdateBudgetItemInput } from './dto/update-budget-item.input';
 import { BudgetItem } from './models/budget-item.model';
 
 @UseGuards(GqlAuthGuard)
@@ -40,10 +41,14 @@ export class BudgetItemResolver {
     return this.budgetItemService.findOne(id);
   }
 
-  // @Mutation(() => BudgetItem)
-  // updateBudgetItem(@Args('updateBudgetItemInput') updateBudgetItemInput: UpdateBudgetItemInput) {
-  //   return this.budgetItemService.update(updateBudgetItemInput.id, updateBudgetItemInput);
-  // }
+  @Mutation(() => BudgetItem)
+  async updateBudgetItem(
+    @CurrentUser() { id: userId },
+    @Args('updateBudgetItemInput') updateBudgetItemInput: UpdateBudgetItemInput
+  ) {
+    await this.authorizeBudgetItem({ userId, budgetItemId: updateBudgetItemInput.id });
+    return this.budgetItemService.update(updateBudgetItemInput);
+  }
 
   @Mutation(() => Boolean)
   async removeBudgetItem(@CurrentUser() { id: userId }: User, @Args('id') budgetItemId: string) {

@@ -1,6 +1,5 @@
 import { graphql } from "@/gql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
-import { Currency } from "@/types";
 import { ApolloError, useMutation } from "@apollo/client";
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -87,8 +86,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
       },
       onCompleted: ({ updateCategory: { name } }) => {
         handleSuccess(`${name} Category updated`);
-        handleOnClose();
-        form.reset();
+        close();
       },
       onError: handleError,
       refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
@@ -108,16 +106,12 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
       },
       onCompleted: ({ createCategory: { name } }) => {
         handleSuccess(`${name} Category created`);
-        handleOnClose();
+        close();
+        form.reset();
       },
       onError: handleError,
       refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
     });
-  };
-
-  const handleOnClose = () => {
-    form.reset();
-    close();
   };
 
   const handleSubmit = (formValues: CategoryFormValues) => {
@@ -129,7 +123,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
   };
 
   return (
-    <Modal opened={opened} onClose={handleOnClose} size="md" title={`${operation} Category`}>
+    <Modal opened={opened} onClose={close} size="md" title={`${operation} Category`}>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Utilities" {...form.getInputProps("name")} />

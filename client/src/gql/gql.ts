@@ -15,6 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  mutation RemoveBudgetItem($removeBudgetItemId: String!) {\n    removeBudgetItem(id: $removeBudgetItemId)\n  }\n": types.RemoveBudgetItemDocument,
     "\n  mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {\n    createBudgetItem(createBudgetItemInput: $createBudgetItemInput) {\n      id\n      name\n    }\n  }\n": types.CreateBudgetItemDocument,
+    "\n  mutation UpdateBudgetItem($updateBudgetItemInput: UpdateBudgetItemInput!) {\n    updateBudgetItem(updateBudgetItemInput: $updateBudgetItemInput) {\n      name\n      id\n    }\n  }\n": types.UpdateBudgetItemDocument,
     "\n  mutation RemoveCategory($removeCategoryId: String!) {\n    removeCategory(id: $removeCategoryId)\n  }\n": types.RemoveCategoryDocument,
     "\n  mutation CreateCategory($createCategoryInput: CreateCategoryInput!) {\n    createCategory(createCategoryInput: $createCategoryInput) {\n      currentAmount\n      id\n      maxAmount\n      name\n    }\n  }\n": types.CreateCategoryDocument,
     "\n  mutation UpdateCategory($updateCategoryInput: UpdateCategoryInput!) {\n    updateCategory(updateCategoryInput: $updateCategoryInput) {\n      name\n      id\n    }\n  }\n": types.UpdateCategoryDocument,
@@ -47,6 +48,10 @@ export function graphql(source: "\n  mutation RemoveBudgetItem($removeBudgetItem
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {\n    createBudgetItem(createBudgetItemInput: $createBudgetItemInput) {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {\n    createBudgetItem(createBudgetItemInput: $createBudgetItemInput) {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateBudgetItem($updateBudgetItemInput: UpdateBudgetItemInput!) {\n    updateBudgetItem(updateBudgetItemInput: $updateBudgetItemInput) {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateBudgetItem($updateBudgetItemInput: UpdateBudgetItemInput!) {\n    updateBudgetItem(updateBudgetItemInput: $updateBudgetItemInput) {\n      name\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

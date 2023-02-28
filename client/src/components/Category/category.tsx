@@ -102,7 +102,7 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
         <Accordion.Panel>
           <Accordion variant="separated" chevron={<ChevronsUp strokeWidth={1.5} />}>
             {budgetItems.map((budgetItem) => (
-              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} budgetId={budgetId} />
+              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} budgetId={budgetId} categoryId={id} />
             ))}
           </Accordion>
         </Accordion.Panel>

@@ -45,13 +45,22 @@ export class BudgetItemService {
     });
   }
 
-  update(id: string, updateBudgetItemInput: UpdateBudgetItemInput) {
-    return `This action updates a #${id} budgetItem`;
+  async update({ id, ...data }: UpdateBudgetItemInput) {
+    const updatedBudgetItem = await this.prismaService.budgetItem.update({
+      where: { id },
+      data: {
+        ...data,
+      },
+    });
+
+    await this.categoryService.updateCurrentTotal(updatedBudgetItem.categoryId);
+
+    return updatedBudgetItem;
   }
 
-  async remove(budgetItemId: string) {
+  async remove(id: string) {
     const deletedBudgetItem = await this.prismaService.budgetItem.delete({
-      where: { id: budgetItemId },
+      where: { id },
     });
 
     if (deletedBudgetItem === undefined) {
