@@ -26,13 +26,8 @@ interface BudgetItemFormValues {
   paid: boolean;
   note?: string;
 }
-type Update = UpdateBudgetItemInput;
+
 type SubmitBudgetItemValues = Omit<CreateBudgetItemInput, "categoryId">;
-type BudgetItemSubmitProps<T extends string> = {
-  [K in `${T}Id`]: string;
-} & {
-  formValues: SubmitBudgetItemValues;
-};
 
 const CREATE_BUDGET_ITEM = graphql(`
   mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {

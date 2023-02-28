@@ -35,7 +35,6 @@ export class BudgetItemResolver {
     return this.budgetItemService.findAll(categoryId);
   }
 
-  //TODO: finish implementing
   @Query(() => BudgetItem, { name: 'budgetItem' })
   findOne(@Args('id') id: string) {
     return this.budgetItemService.findOne(id);

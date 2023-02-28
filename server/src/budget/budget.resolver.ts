@@ -4,11 +4,9 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { User } from 'src/auth/users/models/user.model';
 import { CategoryResolver } from 'src/category/category.resolver';
-import { CategoryService } from 'src/category/category.service';
 import { Category } from 'src/category/entities/category.model';
 import { BudgetService } from './budget.service';
 import { CreateBudgetInput } from './dto/create-budget.input';
-import { UpdateBudgetInput } from './dto/update-budget.input';
 import { Budget } from './models/budget.model';
 
 @UseGuards(GqlAuthGuard)
