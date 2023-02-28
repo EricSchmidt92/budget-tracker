@@ -40,14 +40,26 @@ export class BudgetItemService {
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} budgetItem`;
+    return this.prismaService.budgetItem.findFirstOrThrow({
+      where: { id },
+    });
   }
 
   update(id: string, updateBudgetItemInput: UpdateBudgetItemInput) {
     return `This action updates a #${id} budgetItem`;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} budgetItem`;
+  async remove(budgetItemId: string) {
+    const deletedBudgetItem = await this.prismaService.budgetItem.delete({
+      where: { id: budgetItemId },
+    });
+
+    if (deletedBudgetItem === undefined) {
+      return false;
+    }
+
+    await this.categoryService.updateCurrentTotal(deletedBudgetItem.categoryId);
+
+    return true;
   }
 }

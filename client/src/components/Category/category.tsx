@@ -2,12 +2,12 @@ import { graphql } from "@/gql";
 import { Category as TCategory } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { useMutation } from "@apollo/client";
-import { Accordion, Box, Stack, Text } from "@mantine/core";
+import { Accordion, Box, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
-import { ArrowUpSquare, ChevronsUp, Plus, SquareArrowUp } from "tabler-icons-react";
+import { ChevronsUp } from "tabler-icons-react";
 import BudgetItem from "../BudgetItem/BudgetItem";
 import BudgetItemFormModal from "../BudgetItem/BudgetItemFormModal";
 import CategoryFormModal from "./CategoryFormModal";
@@ -60,9 +60,9 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
       onError: ({ name, message }) =>
         showNotification({
           title: `Error deleting category: ${name}`,
-          message: message,
+          message,
         }),
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId: budgetId } }],
+      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
     });
   };
 
@@ -102,7 +102,7 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
         <Accordion.Panel>
           <Accordion variant="separated" chevron={<ChevronsUp strokeWidth={1.5} />}>
             {budgetItems.map((budgetItem) => (
-              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} />
+              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} budgetId={budgetId} />
             ))}
           </Accordion>
         </Accordion.Panel>

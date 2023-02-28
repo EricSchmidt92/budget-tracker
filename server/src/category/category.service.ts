@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Category } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { Category, Prisma } from '@prisma/client';
+
 import BigNumber from 'bignumber.js';
 import { BudgetService } from 'src/budget/budget.service';
 import { PrismaService } from 'src/prisma.service';
@@ -64,8 +64,7 @@ export class CategoryService {
       await this.budgetService.updateCurrentTotal(category.budgetId);
     } catch (error) {
       console.error(error);
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2017') {
-        console.error(error.message);
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2017') {
         throw new BadRequestException('The categoryId does not seem to be valid');
       }
       return false;

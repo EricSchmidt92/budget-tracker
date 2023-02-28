@@ -98,6 +98,7 @@ export type Mutation = {
   createBudgetItem: BudgetItem;
   createCategory: Category;
   createUser: User;
+  removeBudgetItem: Scalars['Boolean'];
   removeCategory: Scalars['Boolean'];
   updateCategory: Category;
 };
@@ -123,6 +124,11 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationRemoveBudgetItemArgs = {
+  id: Scalars['String'];
+};
+
+
 export type MutationRemoveCategoryArgs = {
   id: Scalars['String'];
 };
@@ -135,6 +141,7 @@ export type MutationUpdateCategoryArgs = {
 export type Query = {
   __typename?: 'Query';
   budget: Budget;
+  budgetItem: BudgetItem;
   budgetItems: Array<BudgetItem>;
   budgets: Array<Budget>;
   categories: Array<Category>;
@@ -144,6 +151,11 @@ export type Query = {
 
 
 export type QueryBudgetArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryBudgetItemArgs = {
   id: Scalars['String'];
 };
 
@@ -175,6 +187,13 @@ export type User = {
   email: Scalars['String'];
   id: Scalars['ID'];
 };
+
+export type RemoveBudgetItemMutationVariables = Exact<{
+  removeBudgetItemId: Scalars['String'];
+}>;
+
+
+export type RemoveBudgetItemMutation = { __typename?: 'Mutation', removeBudgetItem: boolean };
 
 export type CreateBudgetItemMutationVariables = Exact<{
   createBudgetItemInput: CreateBudgetItemInput;
@@ -236,6 +255,7 @@ export type BudgetsQueryVariables = Exact<{ [key: string]: never; }>;
 export type BudgetsQuery = { __typename?: 'Query', budgets: Array<{ __typename?: 'Budget', id: string, maxAmount: string, description?: string | null, name: string }> };
 
 
+export const RemoveBudgetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveBudgetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"removeBudgetItemId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeBudgetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"removeBudgetItemId"}}}]}]}}]} as unknown as DocumentNode<RemoveBudgetItemMutation, RemoveBudgetItemMutationVariables>;
 export const CreateBudgetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateBudgetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetItemInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateBudgetItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createBudgetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createBudgetItemInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createBudgetItemInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateBudgetItemMutation, CreateBudgetItemMutationVariables>;
 export const RemoveCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"removeCategoryId"}}}]}]}}]} as unknown as DocumentNode<RemoveCategoryMutation, RemoveCategoryMutationVariables>;
 export const CreateCategoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCategory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCategoryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCategory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createCategoryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"createCategoryInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAmount"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxAmount"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateCategoryMutation, CreateCategoryMutationVariables>;

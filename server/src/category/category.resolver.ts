@@ -64,8 +64,8 @@ export class CategoryResolver {
   }
 
   @ResolveField('budgetItems', () => [BudgetItem])
-  async budgetItems(@Parent() { id: categoryId }: Category) {
-    return this.budgetItemResolver.findAll(categoryId);
+  async budgetItems(@CurrentUser() user: User, @Parent() { id: categoryId }: Category) {
+    return this.budgetItemResolver.findAll(user, categoryId);
   }
 
   private async authorizeBudget({ userId, budgetId }: AuthorizeProps<'budget'>) {

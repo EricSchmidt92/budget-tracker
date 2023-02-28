@@ -1,15 +1,56 @@
-import { BudgetItem } from "@/gql/graphql";
-import { Accordion, ActionIcon, Badge, Button, Group, Stack, Text, useMantineColorScheme } from "@mantine/core";
+import { graphql } from "@/gql";
+import { BudgetItem as TBudgetItem } from "@/gql/graphql";
+import { GET_BUDGET } from "@/pages/budget/[id]";
+import { useMutation } from "@apollo/client";
+import { Accordion, Badge, Button, Group, Stack, Text, useMantineColorScheme } from "@mantine/core";
+import { openConfirmModal } from "@mantine/modals";
+import { showNotification } from "@mantine/notifications";
 import { Edit, Trash } from "tabler-icons-react";
 
 interface BudgetItemProps {
-  budgetItem: BudgetItem;
+  budgetItem: TBudgetItem;
+  budgetId: string;
 }
 
-const BudgetItem = ({ budgetItem: { name, amount, dueDate, paid, paidDate, note, id } }: BudgetItemProps) => {
+const DELETE_BUDGET_ITEM = graphql(`
+  mutation RemoveBudgetItem($removeBudgetItemId: String!) {
+    removeBudgetItem(id: $removeBudgetItemId)
+  }
+`);
+
+const BudgetItem = ({ budgetItem: { name, amount, dueDate, paid, paidDate, note, id }, budgetId }: BudgetItemProps) => {
+  const [removeBudgetItemMutation] = useMutation(DELETE_BUDGET_ITEM);
   const { colorScheme } = useMantineColorScheme();
   const parseDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" });
+  };
+
+  const removeBudgetItem = async () => {
+    await removeBudgetItemMutation({
+      variables: {
+        removeBudgetItemId: id,
+      },
+      onCompleted: () =>
+        showNotification({
+          title: "Success",
+          message: "Budget item successfully deleted",
+        }),
+      onError: ({ name, message }) =>
+        showNotification({
+          title: `Error deleting budget item ${name}`,
+          message,
+        }),
+      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+    });
+  };
+
+  const handleDeleteBudgetItem = () => {
+    openConfirmModal({
+      title: "Confirm Delete Budget Item",
+      children: <Text>Are you sure you wish to delete this budget item?</Text>,
+      labels: { cancel: "Cancel", confirm: "Confirm" },
+      onConfirm: removeBudgetItem,
+    });
   };
 
   return (
@@ -70,7 +111,14 @@ const BudgetItem = ({ budgetItem: { name, amount, dueDate, paid, paidDate, note,
               >
                 Edit
               </Button>
-              <Button variant="light" size="sm" color="red.2" compact leftIcon={<Trash strokeWidth={1.5} size={18} />}>
+              <Button
+                variant="light"
+                size="sm"
+                color="red.2"
+                compact
+                leftIcon={<Trash strokeWidth={1.5} size={18} />}
+                onClick={() => handleDeleteBudgetItem()}
+              >
                 Delete
               </Button>
             </Group>
