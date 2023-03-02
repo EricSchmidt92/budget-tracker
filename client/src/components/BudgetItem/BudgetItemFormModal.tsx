@@ -65,6 +65,7 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
         note: "",
       };
 
+  //TODO: add validation for form
   const form = useForm<BudgetItemFormValues>({
     initialValues: {
       ...initialValues,

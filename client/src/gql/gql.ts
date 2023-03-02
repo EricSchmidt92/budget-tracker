@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel-plugin for production.
  */
 const documents = {
+    "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n": types.CreateBudgetDocument,
     "\n  mutation RemoveBudgetItem($removeBudgetItemId: String!) {\n    removeBudgetItem(id: $removeBudgetItemId)\n  }\n": types.RemoveBudgetItemDocument,
     "\n  query BudgetItem($budgetItemId: String!) {\n    budgetItem(id: $budgetItemId) {\n      amount\n      dueDate\n      id\n      name\n      note\n      paid\n      paidDate\n    }\n  }\n": types.BudgetItemDocument,
     "\n  mutation CreateBudgetItem($createBudgetItemInput: CreateBudgetItemInput!) {\n    createBudgetItem(createBudgetItemInput: $createBudgetItemInput) {\n      id\n      name\n    }\n  }\n": types.CreateBudgetItemDocument,
@@ -24,7 +25,6 @@ const documents = {
     "\n  mutation createUser($createUserData: CreateUserInput!) {\n    createUser(createUserData: $createUserData) {\n      id\n      email\n    }\n  }\n": types.CreateUserDocument,
     "\n  query Me {\n    me {\n      id\n      email\n    }\n  }\n": types.MeDocument,
     "\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      currentAmount\n      description\n      id\n      maxAmount\n      name\n      categories {\n        id\n        maxAmount\n      }\n    }\n  }\n": types.BudgetDocument,
-    "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n": types.CreateBudgetDocument,
     "\n  query Budgets {\n    budgets {\n      id\n      maxAmount\n      description\n      name\n    }\n  }\n": types.BudgetsDocument,
 };
 
@@ -42,6 +42,10 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -86,10 +90,6 @@ export function graphql(source: "\n  query Me {\n    me {\n      id\n      email
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      currentAmount\n      description\n      id\n      maxAmount\n      name\n      categories {\n        id\n        maxAmount\n      }\n    }\n  }\n"): (typeof documents)["\n  query Budget($budgetId: String!) {\n    budget(id: $budgetId) {\n      currentAmount\n      description\n      id\n      maxAmount\n      name\n      categories {\n        id\n        maxAmount\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {\n    createBudget(createBudgetInput: $createBudgetInput) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

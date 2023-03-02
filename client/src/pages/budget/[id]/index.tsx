@@ -20,7 +20,7 @@ import accounting from "accounting";
 import BigNumber from "bignumber.js";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { AlertTriangle, Plus } from "tabler-icons-react";
+import { AlertTriangle, Edit, Plus } from "tabler-icons-react";
 
 export const GET_BUDGET = graphql(`
   query Budget($budgetId: String!) {
@@ -40,7 +40,7 @@ export const GET_BUDGET = graphql(`
 
 const BudgetPage: NextPage = () => {
   const { colorScheme } = useMantineColorScheme();
-  const [opened, { close, open }] = useDisclosure(false);
+  const [categoryFormOpened, { close: categoryFormClose, open: categoryFormOpen }] = useDisclosure(false);
   const { query } = useRouter();
   const budgetId = query.id as string;
   const { data, error, loading } = useQuery(GET_BUDGET, {
@@ -87,9 +87,12 @@ const BudgetPage: NextPage = () => {
             </Text>{" "}
             / {maxAmount}
           </Title>
-          <Button leftIcon={<Plus strokeWidth={1.5} />} onClick={open}>
-            Add New Category
-          </Button>
+          <Group>
+            <Button leftIcon={<Edit strokeWidth={1.5} />}>Edit Category</Button>
+            <Button leftIcon={<Plus strokeWidth={1.5} />} onClick={categoryFormOpen}>
+              Add Category
+            </Button>
+          </Group>
         </Group>
 
         {isCategoryMaxError && (
@@ -120,7 +123,7 @@ const BudgetPage: NextPage = () => {
           ))}
         </Accordion>
       </Stack>
-      <CategoryFormModal opened={opened} close={close} budgetId={id} />
+      <CategoryFormModal opened={categoryFormOpened} close={categoryFormClose} budgetId={id} />
     </Box>
   );
 };

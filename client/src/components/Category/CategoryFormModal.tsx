@@ -54,6 +54,7 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
 
   const initialValues = values ? values.initialValues : { maxAmount: 0, name: "" };
 
+  //TODO: add validation here.
   const form = useForm<CategoryFormValues>({
     initialValues,
   });
