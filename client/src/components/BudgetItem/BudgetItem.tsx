@@ -1,18 +1,18 @@
 import { graphql } from "@/gql";
-import { BudgetItem as TBudgetItem } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
-import { useMutation } from "@apollo/client";
-import { Accordion, Badge, Button, Group, Stack, Text, useMantineColorScheme } from "@mantine/core";
+import { useMutation, useQuery } from "@apollo/client";
+import { Accordion, Badge, Button, Group, Stack, Text, Title, useMantineColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
 import { Edit, Trash } from "tabler-icons-react";
+import { GET_CATEGORY } from "../Category/Category";
 import BudgetItemFormModal from "./BudgetItemFormModal";
 
 interface BudgetItemProps {
-  budgetItem: TBudgetItem;
   budgetId: string;
+  budgetItemId: string;
   categoryId: string;
 }
 
@@ -22,14 +22,42 @@ const DELETE_BUDGET_ITEM = graphql(`
   }
 `);
 
-const BudgetItem = ({
-  budgetItem: { name, amount, dueDate, paid, paidDate, note, id },
-  budgetId,
-  categoryId,
-}: BudgetItemProps) => {
+export const GET_BUDGET_ITEM = graphql(`
+  query BudgetItem($budgetItemId: String!) {
+    budgetItem(id: $budgetItemId) {
+      amount
+      dueDate
+      id
+      name
+      note
+      paid
+      paidDate
+    }
+  }
+`);
+
+const BudgetItem = ({ budgetItemId, categoryId, budgetId }: BudgetItemProps) => {
   const [removeBudgetItemMutation] = useMutation(DELETE_BUDGET_ITEM);
+  const { data, loading, error } = useQuery(GET_BUDGET_ITEM, { variables: { budgetItemId } });
   const [opened, { open, close }] = useDisclosure(false);
   const { colorScheme } = useMantineColorScheme();
+
+  if (error) {
+    return (
+      <Title>
+        {error.name} - {error.message}
+      </Title>
+    );
+  }
+
+  if (loading || !data) {
+    return <Title>Loading</Title>;
+  }
+
+  const {
+    budgetItem: { id, amount, name, paid, paidDate, dueDate, note },
+  } = data;
+
   const parseDateForDisplay = (date: string) => {
     const formatter = new Intl.DateTimeFormat("en-US", {
       month: "2-digit",
@@ -59,7 +87,10 @@ const BudgetItem = ({
           title: `Error deleting budget item ${name}`,
           message,
         }),
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+      refetchQueries: [
+        { query: GET_CATEGORY, variables: { categoryId } },
+        { query: GET_BUDGET, variables: { budgetId } },
+      ],
     });
   };
 

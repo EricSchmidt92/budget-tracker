@@ -1,8 +1,7 @@
 import { graphql } from "@/gql";
-import { Category as TCategory } from "@/gql/graphql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
-import { useMutation } from "@apollo/client";
-import { Accordion, Box, Text } from "@mantine/core";
+import { useMutation, useQuery } from "@apollo/client";
+import { Accordion, Box, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { openConfirmModal } from "@mantine/modals";
 import { showNotification } from "@mantine/notifications";
@@ -14,7 +13,7 @@ import CategoryFormModal from "./CategoryFormModal";
 import CategoryMenu from "./CategoryMenu";
 
 export interface CategoryProps {
-  category: TCategory;
+  categoryId: string;
   budgetId: string;
 }
 
@@ -30,10 +29,41 @@ const DELETE_CATEGORY = graphql(`
   }
 `);
 
-const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id }, budgetId }: CategoryProps) => {
+export const GET_CATEGORY = graphql(`
+  query Category($categoryId: String!) {
+    category(id: $categoryId) {
+      id
+      name
+      currentAmount
+      maxAmount
+      budgetItems {
+        id
+      }
+    }
+  }
+`);
+
+const Category = ({ categoryId, budgetId }: CategoryProps) => {
   const [categoryOpened, { close: closeCategory, open: openCategory }] = useDisclosure(false);
   const [budgetItemOpened, { close: closeBudgetItem, open: openBudgetItem }] = useDisclosure(false);
+  const { data, loading, error } = useQuery(GET_CATEGORY, { variables: { categoryId } });
   const [removeCategoryMutation] = useMutation(DELETE_CATEGORY);
+
+  if (error) {
+    return (
+      <Title>
+        {error.name} - {error.message}
+      </Title>
+    );
+  }
+
+  if (loading || !data) {
+    return <Title>Loading</Title>;
+  }
+
+  const {
+    category: { currentAmount, maxAmount, id, name, budgetItems },
+  } = data;
   const currentAmountColor = accounting.unformat(currentAmount) > accounting.unformat(maxAmount) ? "red" : "green";
 
   const handleDeleteCategory = async () => {
@@ -62,7 +92,10 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
           title: `Error deleting category: ${name}`,
           message,
         }),
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+      refetchQueries: [
+        { query: GET_BUDGET, variables: { budgetId } },
+        { query: GET_CATEGORY, variables: { categoryId } },
+      ],
     });
   };
 
@@ -101,8 +134,8 @@ const Category = ({ category: { name, currentAmount, maxAmount, budgetItems, id 
 
         <Accordion.Panel>
           <Accordion variant="separated" chevron={<ChevronsUp strokeWidth={1.5} />}>
-            {budgetItems.map((budgetItem) => (
-              <BudgetItem key={budgetItem.id} budgetItem={budgetItem} budgetId={budgetId} categoryId={id} />
+            {budgetItems.map(({ id }) => (
+              <BudgetItem key={id} budgetId={budgetId} budgetItemId={id} categoryId={categoryId} />
             ))}
           </Accordion>
         </Accordion.Panel>

@@ -6,6 +6,8 @@ import { Button, Checkbox, Modal, NumberInput, Stack, TextInput } from "@mantine
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
+import { GET_CATEGORY } from "../Category/Category";
+import { GET_BUDGET_ITEM } from "./BudgetItem";
 
 interface BudgetItemFormProps {
   budgetId: string;
@@ -114,7 +116,10 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
         form.reset();
       },
       onError: handleError,
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+      refetchQueries: [
+        { query: GET_CATEGORY, variables: { categoryId } },
+        { query: GET_BUDGET, variables: { budgetId } },
+      ],
     });
   };
 
@@ -131,7 +136,11 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
         close();
       },
       onError: handleError,
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+      refetchQueries: [
+        { query: GET_BUDGET_ITEM, variables: { budgetItemId: id } },
+        { query: GET_CATEGORY, variables: { categoryId } },
+        { query: GET_BUDGET, variables: { budgetId } },
+      ],
     });
   };
 
@@ -150,7 +159,7 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Target Shopping Trip" {...form.getInputProps("name")} />
-          <NumberInput withAsterisk label="Amount" type="number" {...form.getInputProps("amount")} />
+          <NumberInput withAsterisk label="Amount" type="number" precision={2} {...form.getInputProps("amount")} />
           <Checkbox
             label="Does this Item have a due date?"
             checked={initialValues.hasDueDate}

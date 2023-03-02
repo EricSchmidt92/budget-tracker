@@ -1,10 +1,11 @@
 import { graphql } from "@/gql";
 import { GET_BUDGET } from "@/pages/budget/[id]";
 import { ApolloError, useMutation } from "@apollo/client";
-import { Button, Modal, Stack, TextInput } from "@mantine/core";
+import { Button, Modal, NumberInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
+import { GET_CATEGORY } from "./Category";
 
 interface CategoryFormValues {
   name: string;
@@ -89,7 +90,10 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
         close();
       },
       onError: handleError,
-      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
+      refetchQueries: [
+        { query: GET_BUDGET, variables: { budgetId } },
+        { query: GET_CATEGORY, variables: { categoryId } },
+      ],
     });
   };
 
@@ -127,11 +131,12 @@ const CategoryFormModal = ({ budgetId, opened, close, values }: CategoryFormProp
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="xl">
           <TextInput withAsterisk label="Name" placeholder="Utilities" {...form.getInputProps("name")} />
-          <TextInput
+          <NumberInput
             withAsterisk
             label="Category Budget"
             placeholder="500"
             type="number"
+            precision={2}
             {...form.getInputProps("maxAmount")}
           />
           <Button type="submit">{operation}</Button>

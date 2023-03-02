@@ -31,19 +31,8 @@ export const GET_BUDGET = graphql(`
       maxAmount
       name
       categories {
-        name
-        maxAmount
         id
-        currentAmount
-        budgetItems {
-          amount
-          dueDate
-          id
-          name
-          note
-          paid
-          paidDate
-        }
+        maxAmount
       }
     }
   }
@@ -102,6 +91,7 @@ const BudgetPage: NextPage = () => {
             Add New Category
           </Button>
         </Group>
+
         {isCategoryMaxError && (
           <Alert
             title="Category and Budget mismatch"
@@ -116,7 +106,7 @@ const BudgetPage: NextPage = () => {
               <Text align="right">{accounting.formatMoney(categoryMaxAmountSum)}</Text>
               <Text>Budget Amount:</Text> <Text align="right">{maxAmount}</Text>
               <Box></Box>
-              <Divider w="70%" sx={{ alignSelf: "flex-end" }} />
+              <Divider w="100%" sx={{ alignSelf: "flex-end" }} />
               <Text>Overage Amount:</Text> <Text align="right">{overageAmount}</Text>
             </SimpleGrid>
           </Alert>
@@ -125,8 +115,8 @@ const BudgetPage: NextPage = () => {
 
       <Stack w="60%" mt="xl">
         <Accordion variant="separated" chevronPosition="left">
-          {categories.map((category) => (
-            <Category key={category.id} category={category} budgetId={budgetId} />
+          {categories.map(({ id }) => (
+            <Category key={id} categoryId={id} budgetId={budgetId} />
           ))}
         </Accordion>
       </Stack>

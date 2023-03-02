@@ -1,7 +1,7 @@
 import { graphql } from "@/gql";
 import { GET_BUDGETS } from "@/pages/index";
 import { useMutation } from "@apollo/client";
-import { Box, Button, Stack, Textarea, TextInput } from "@mantine/core";
+import { Box, Button, NumberInput, Stack, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
@@ -63,11 +63,12 @@ const CreateBudget = () => {
       <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <Stack spacing={10}>
           <TextInput withAsterisk label="Name" placeholder="Utilities" {...form.getInputProps("name")} />
-          <TextInput
+          <NumberInput
             withAsterisk
             label="Budget Limit"
             placeholder="500"
             type="number"
+            precision={2}
             {...form.getInputProps("maxAmount")}
           />
           <Textarea
