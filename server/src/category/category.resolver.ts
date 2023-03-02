@@ -1,5 +1,6 @@
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Prisma } from '@prisma/client';
 
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
@@ -77,10 +78,18 @@ export class CategoryResolver {
   }
 
   private async authorizeCategory({ userId, categoryId }: AuthorizeProps<'category'>) {
-    const { userId: categoryUserId } = await this.categoryService.findOne(categoryId);
+    let categoryUserId: string;
+
+    try {
+      ({ userId: categoryUserId } = await this.categoryService.findOne(categoryId));
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new NotFoundException(`Category with id of ${categoryId} not found`);
+      }
+    }
 
     if (categoryUserId !== userId) {
-      throw new UnauthorizedException('User does not own the category');
+      throw new UnauthorizedException('User does not own the Category');
     }
   }
 }

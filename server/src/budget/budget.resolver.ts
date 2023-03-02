@@ -1,12 +1,15 @@
-import { UseGuards } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { User } from 'src/auth/users/models/user.model';
 import { CategoryResolver } from 'src/category/category.resolver';
 import { Category } from 'src/category/entities/category.model';
+import { AuthorizeProps } from 'types';
 import { BudgetService } from './budget.service';
 import { CreateBudgetInput } from './dto/create-budget.input';
+import { UpdateBudgetInput } from './dto/update-budget.input';
 import { Budget } from './models/budget.model';
 
 @UseGuards(GqlAuthGuard)
@@ -29,11 +32,14 @@ export class BudgetResolver {
     return this.budgetService.findOne(userId, id);
   }
 
-  // these are not yet implemented...
-  // @Mutation(() => Budget)
-  // updateBudget(@Args('updateBudgetInput') updateBudgetInput: UpdateBudgetInput) {
-  //   return this.budgetService.update(updateBudgetInput.id, updateBudgetInput);
-  // }
+  @Mutation(() => Budget)
+  async updateBudget(
+    @CurrentUser() { id: userId }: User,
+    @Args('updateBudgetInput') updateBudgetInput: UpdateBudgetInput
+  ) {
+    await this.authorizeBudget({ userId, budgetId: updateBudgetInput.id });
+    return this.budgetService.update(updateBudgetInput.id, updateBudgetInput);
+  }
 
   // @Mutation(() => Budget)
   // removeBudget(@Args('id') id: string) {
@@ -43,5 +49,20 @@ export class BudgetResolver {
   @ResolveField('categories', () => [Category])
   async categories(@CurrentUser() user: User, @Parent() { id: budgetId }: Budget) {
     return this.categoryResolver.findAll(user, budgetId);
+  }
+
+  private async authorizeBudget({ userId, budgetId }: AuthorizeProps<'budget'>) {
+    let foundUserId: string;
+    try {
+      ({ userId: foundUserId } = await this.budgetService.findOne(userId, budgetId));
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new NotFoundException(`Budget with id of ${budgetId} not found`);
+      }
+    }
+
+    if (foundUserId !== userId) {
+      throw new UnauthorizedException('User does not own the Budget');
+    }
   }
 }

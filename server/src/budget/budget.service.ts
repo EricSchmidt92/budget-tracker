@@ -46,7 +46,12 @@ export class BudgetService {
   }
 
   update(id: string, updateBudgetInput: UpdateBudgetInput) {
-    return `This action updates a #${id} budget`;
+    return this.prismaService.budget.update({
+      where: { id },
+      data: {
+        ...updateBudgetInput,
+      },
+    });
   }
 
   remove(id: string) {

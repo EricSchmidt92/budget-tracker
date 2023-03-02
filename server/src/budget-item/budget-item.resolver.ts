@@ -1,6 +1,6 @@
 import { NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { BudgetItem as PrismaBudgetItem, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { User } from 'src/auth/users/models/user.model';
@@ -64,17 +64,17 @@ export class BudgetItemResolver {
   }
 
   private async authorizeBudgetItem({ userId, budgetItemId }: AuthorizeProps<'budgetItem'>) {
-    let budgetItem: PrismaBudgetItem;
+    let budgetItemUserId: string;
     try {
-      budgetItem = await this.budgetItemService.findOne(budgetItemId);
+      ({ userId: budgetItemUserId } = await this.budgetItemService.findOne(budgetItemId));
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new NotFoundException(`Budget Item not found with id of: ${budgetItemId}`);
       }
     }
 
-    if (budgetItem.userId !== userId) {
-      throw new UnauthorizedException('User does not own the budget Item');
+    if (budgetItemUserId !== userId) {
+      throw new UnauthorizedException('User does not own the Budget Item');
     }
   }
 }
