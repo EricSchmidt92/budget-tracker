@@ -92,10 +92,7 @@ const Category = ({ categoryId, budgetId }: CategoryProps) => {
           title: `Error deleting category: ${name}`,
           message,
         }),
-      refetchQueries: [
-        { query: GET_BUDGET, variables: { budgetId } },
-        { query: GET_CATEGORY, variables: { categoryId } },
-      ],
+      refetchQueries: [{ query: GET_BUDGET, variables: { budgetId } }],
     });
   };
 

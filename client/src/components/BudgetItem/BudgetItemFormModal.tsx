@@ -68,7 +68,6 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
   const form = useForm<BudgetItemFormValues>({
     initialValues: {
       ...initialValues,
-      note: "",
     },
   });
 
@@ -77,10 +76,10 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
 
     return {
       paid,
-      paidDate: paid ? paidDate : undefined,
-      dueDate: hasDueDate ? dueDate : undefined,
+      paidDate: paid ? paidDate : null,
+      dueDate: hasDueDate ? dueDate : null,
       amount: accounting.formatMoney(amount),
-      note: note ? note : undefined,
+      note: note ? note : null,
       name,
     };
   };
@@ -162,8 +161,8 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
           <NumberInput withAsterisk label="Amount" type="number" precision={2} {...form.getInputProps("amount")} />
           <Checkbox
             label="Does this Item have a due date?"
-            checked={initialValues.hasDueDate}
             {...form.getInputProps("hasDueDate")}
+            checked={form.getInputProps("hasDueDate").value}
           />
           {form.values.hasDueDate && (
             <TextInput
@@ -175,8 +174,8 @@ const BudgetItemFormModal = ({ opened, close, values, categoryId, budgetId }: Bu
           )}
           <Checkbox
             label="Have you paid this item off yet?"
-            checked={initialValues.paid}
             {...form.getInputProps("paid")}
+            checked={form.getInputProps("paid").value}
           />
           {form.values.paid && (
             <TextInput
