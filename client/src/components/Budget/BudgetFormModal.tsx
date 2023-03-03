@@ -14,6 +14,18 @@ interface BudgetFormValues {
   description?: string;
 }
 
+interface BudgetFormProps {
+  values?: {
+    budgetId: string;
+    initialValues: BudgetFormValues;
+  };
+}
+
+interface UpdateBudgetProps {
+  formValues: BudgetFormValues;
+  budgetId: string;
+}
+
 export const CREATE_BUDGET = graphql(`
   mutation CreateBudget($createBudgetInput: CreateBudgetInput!) {
     createBudget(createBudgetInput: $createBudgetInput) {
@@ -22,15 +34,30 @@ export const CREATE_BUDGET = graphql(`
   }
 `);
 
-const BudgetFormModal = () => {
+const UPDATE_BUDGET = graphql(`
+  mutation UpdateBudget($updateBudgetInput: UpdateBudgetInput!) {
+    updateBudget(updateBudgetInput: $updateBudgetInput) {
+      id
+      name
+    }
+  }
+`);
+
+const BudgetForm = ({ values }: BudgetFormProps) => {
+  const [updateBudget] = useMutation(UPDATE_BUDGET);
   const [createBudget] = useMutation(CREATE_BUDGET);
   const router = useRouter();
+  const operation = values ? "Update" : "Create";
+  const initialValues = values
+    ? values.initialValues
+    : {
+        name: "",
+        maxAmount: 0,
+        description: "",
+      };
+
   const form = useForm<BudgetFormValues>({
-    initialValues: {
-      name: "",
-      description: "",
-      maxAmount: 0,
-    },
+    initialValues,
     validate: {
       name: (value) => (value !== "" ? null : "Please enter a name"),
       maxAmount: (value) => {
@@ -44,13 +71,44 @@ const BudgetFormModal = () => {
     },
   });
 
-  const handleSubmit = async (values: typeof form.values) => {
+  const handleUpdateBudget = async ({ formValues: { maxAmount, ...formVals }, budgetId }: UpdateBudgetProps) => {
+    const parsedMaxAmount = accounting.formatMoney(maxAmount);
     try {
-      const maxAmount = accounting.formatMoney(values.maxAmount);
+      await updateBudget({
+        variables: {
+          updateBudgetInput: {
+            ...formVals,
+            id: budgetId,
+            maxAmount: parsedMaxAmount,
+          },
+        },
+        onCompleted: ({ updateBudget: { id } }) => router.push(`/budget/${id}`),
+        onError: ({ name, message }) => {
+          showNotification({
+            title: `Error: ${name}`,
+            message,
+            color: "red",
+          });
+        },
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        showNotification({
+          title: `ERROR: ${error.name}`,
+          message: error.message,
+          color: "red",
+        });
+      }
+    }
+  };
+
+  const handleAddBudget = async (formValues: BudgetFormValues) => {
+    try {
+      const maxAmount = accounting.formatMoney(formValues.maxAmount);
       await createBudget({
         variables: {
           createBudgetInput: {
-            ...values,
+            ...formValues,
             maxAmount,
           },
         },
@@ -81,6 +139,14 @@ const BudgetFormModal = () => {
     }
   };
 
+  const handleSubmit = (formValues: BudgetFormValues) => {
+    if (values) {
+      return handleUpdateBudget({ formValues, budgetId: values.budgetId });
+    }
+
+    return handleAddBudget(formValues);
+  };
+
   return (
     <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
       <Stack spacing={10}>
@@ -95,11 +161,11 @@ const BudgetFormModal = () => {
         />
         <Textarea label="Description" placeholder="Electric, water, and sewer" {...form.getInputProps("description")} />
         <Button fullWidth mt="xl" type="submit">
-          Create Budget
+          {operation} Budget
         </Button>
       </Stack>
     </form>
   );
 };
 
-export default BudgetFormModal;
+export default BudgetForm;

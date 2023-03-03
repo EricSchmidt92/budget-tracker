@@ -40,6 +40,7 @@ export const GET_BUDGET = graphql(`
 
 const BudgetPage: NextPage = () => {
   const { colorScheme } = useMantineColorScheme();
+  const router = useRouter();
   const [categoryFormOpened, { close: categoryFormClose, open: categoryFormOpen }] = useDisclosure(false);
   const { query } = useRouter();
   const budgetId = query.id as string;
@@ -88,8 +89,14 @@ const BudgetPage: NextPage = () => {
             / {maxAmount}
           </Title>
           <Group>
-            <Button leftIcon={<Edit strokeWidth={1.5} />}>Edit Category</Button>
-            <Button leftIcon={<Plus strokeWidth={1.5} />} onClick={categoryFormOpen}>
+            <Button
+              size="xs"
+              leftIcon={<Edit strokeWidth={1.5} />}
+              onClick={() => router.push(`/budget/${budgetId}/edit`)}
+            >
+              Edit Budget
+            </Button>
+            <Button size="xs" leftIcon={<Plus strokeWidth={1.5} />} onClick={categoryFormOpen}>
               Add Category
             </Button>
           </Group>
