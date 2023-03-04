@@ -41,10 +41,11 @@ export class BudgetResolver {
     return this.budgetService.update(updateBudgetInput.id, updateBudgetInput);
   }
 
-  // @Mutation(() => Budget)
-  // removeBudget(@Args('id') id: string) {
-  //   return this.budgetService.remove(id);
-  // }
+  @Mutation(() => Budget)
+  async removeBudget(@CurrentUser() { id: userId }, @Args('id') budgetId: string) {
+    await this.authorizeBudget({ userId, budgetId });
+    return this.budgetService.remove(budgetId);
+  }
 
   @ResolveField('categories', () => [Category])
   async categories(@CurrentUser() user: User, @Parent() { id: budgetId }: Budget) {

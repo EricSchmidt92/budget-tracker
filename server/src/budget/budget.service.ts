@@ -45,17 +45,19 @@ export class BudgetService {
     });
   }
 
-  update(id: string, updateBudgetInput: UpdateBudgetInput) {
+  update(budgetId: string, updateBudgetInput: UpdateBudgetInput) {
     return this.prismaService.budget.update({
-      where: { id },
+      where: { id: budgetId },
       data: {
         ...updateBudgetInput,
       },
     });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} budget`;
+  remove(budgetId: string) {
+    return this.prismaService.budget.delete({
+      where: { id: budgetId },
+    });
   }
 
   async updateCurrentTotal(budgetId: string) {

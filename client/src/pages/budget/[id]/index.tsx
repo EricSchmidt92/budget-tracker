@@ -1,7 +1,8 @@
 import Category from "@/components/Category/Category";
 import CategoryFormModal from "@/components/Category/CategoryFormModal";
 import { graphql } from "@/gql";
-import { useQuery } from "@apollo/client";
+import { GET_BUDGETS } from "@/pages";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
   Alert,
@@ -16,11 +17,13 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { openConfirmModal } from "@mantine/modals";
+import { showNotification } from "@mantine/notifications";
 import accounting from "accounting";
 import BigNumber from "bignumber.js";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { AlertTriangle, Edit, Plus } from "tabler-icons-react";
+import { AlertTriangle, Edit, Plus, Trash } from "tabler-icons-react";
 
 export const GET_BUDGET = graphql(`
   query Budget($budgetId: String!) {
@@ -38,6 +41,15 @@ export const GET_BUDGET = graphql(`
   }
 `);
 
+const REMOVE_BUDGET = graphql(`
+  mutation RemoveBudget($removeBudgetId: String!) {
+    removeBudget(id: $removeBudgetId) {
+      id
+      name
+    }
+  }
+`);
+
 const BudgetPage: NextPage = () => {
   const { colorScheme } = useMantineColorScheme();
   const router = useRouter();
@@ -49,6 +61,8 @@ const BudgetPage: NextPage = () => {
       budgetId,
     },
   });
+
+  const [removeBudgetMutation] = useMutation(REMOVE_BUDGET);
 
   if (error) {
     return (
@@ -77,6 +91,40 @@ const BudgetPage: NextPage = () => {
 
   const overageAmount = accounting.formatMoney(categoryMaxAmountSum - unformattedMaxAmount);
   const isCategoryMaxError = categoryMaxAmountSum > unformattedMaxAmount;
+
+  const removeBudget = async () => {
+    await removeBudgetMutation({
+      variables: {
+        removeBudgetId: budgetId,
+      },
+      onCompleted: ({ removeBudget: { name } }) => {
+        showNotification({
+          title: "Success",
+          message: `${name} Budget Removed Successfully`,
+        });
+        router.push("/");
+      },
+      onError: ({ name, message }) =>
+        showNotification({
+          title: `Error: ${name}`,
+          message,
+        }),
+      refetchQueries: [GET_BUDGETS],
+    });
+  };
+
+  const handleDeleteBudget = () => {
+    openConfirmModal({
+      title: "Confirm Delete Budget",
+      children: (
+        <Text>
+          Are you sure you wish to delete this budget? You will lose all associated Category and Budget Item Data
+        </Text>
+      ),
+      labels: { cancel: "Cancel", confirm: "Confirm" },
+      onConfirm: removeBudget,
+    });
+  };
   return (
     <Box w="90%" h="100%" mx="auto">
       <Stack>
@@ -89,6 +137,9 @@ const BudgetPage: NextPage = () => {
             / {maxAmount}
           </Title>
           <Group>
+            <Button size="xs" leftIcon={<Plus strokeWidth={1.5} />} onClick={categoryFormOpen}>
+              Add Category
+            </Button>
             <Button
               size="xs"
               leftIcon={<Edit strokeWidth={1.5} />}
@@ -96,8 +147,8 @@ const BudgetPage: NextPage = () => {
             >
               Edit Budget
             </Button>
-            <Button size="xs" leftIcon={<Plus strokeWidth={1.5} />} onClick={categoryFormOpen}>
-              Add Category
+            <Button size="xs" leftIcon={<Trash strokeWidth={1.5} />} onClick={handleDeleteBudget}>
+              Delete Budget
             </Button>
           </Group>
         </Group>
