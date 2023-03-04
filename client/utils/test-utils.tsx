@@ -1,12 +1,9 @@
 import authenticatedVar from "@/constants/authenticated";
-import {
-  ApolloClient,
-  ApolloProvider,
-  HttpLink,
-  InMemoryCache,
-} from "@apollo/client";
+import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { ColorSchemeProvider, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { NotificationsProvider } from "@mantine/notifications";
 import { render, RenderOptions } from "@testing-library/react";
 import fetch from "cross-fetch";
 import { FC, ReactElement, ReactNode } from "react";
@@ -18,10 +15,7 @@ const httpLink = new HttpLink({
 });
 
 const logoutLink = onError(({ graphQLErrors, networkError }) => {
-  if (
-    graphQLErrors?.length &&
-    (graphQLErrors[0].extensions?.response as any)?.statusCode === 401
-  ) {
+  if (graphQLErrors?.length && (graphQLErrors[0].extensions?.response as any)?.statusCode === 401) {
     authenticatedVar(false);
   }
 
@@ -39,22 +33,18 @@ const WithProviders: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <ApolloProvider client={mockClient}>
       <ColorSchemeProvider colorScheme="dark" toggleColorScheme={() => {}}>
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={{ primaryColor: "violet" }}
-        >
-          {children}
+        <MantineProvider withGlobalStyles withNormalizeCSS theme={{ primaryColor: "violet" }}>
+          <NotificationsProvider>
+            <ModalsProvider>{children}</ModalsProvider>
+          </NotificationsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </ApolloProvider>
   );
 };
 
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
-) => render(ui, { wrapper: WithProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
+  render(ui, { wrapper: WithProviders, ...options });
 
 export * from "@testing-library/react";
 export { customRender as render };

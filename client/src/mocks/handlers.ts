@@ -1,32 +1,20 @@
-import {
-  CategoriesQuery,
-  CategoriesQueryVariables,
-  Category,
-  CreateCategoryMutation,
-  CreateCategoryMutationVariables,
-  MeQuery,
-  MeQueryVariables,
-  RemoveCategoryMutation,
-  RemoveCategoryMutationVariables,
-} from "@/gql/graphql";
+import { BudgetsQuery, BudgetsQueryVariables, MeQuery, MeQueryVariables } from "@/gql/graphql";
 import { graphql } from "msw";
 
-const initialCategories: Category[] = [
+export const budgets: BudgetsQuery["budgets"] = [
   {
-    id: "category-1",
-    name: "electric",
-    __typename: "Category",
+    id: "1",
+    maxAmount: "$1000",
+    name: "Unique First Budget",
+    description: "The 1st budget description",
   },
   {
-    id: "category-2",
-    name: "Food",
-    __typename: "Category",
+    id: "2",
+    maxAmount: "$2000",
+    name: "Unique Second Budget",
+    description: "The 2nd budget description",
   },
 ];
-
-export let categories: Category[] = initialCategories;
-
-export const resetCategories = () => (categories = initialCategories);
 
 export const handlers = [
   graphql.query<MeQuery, MeQueryVariables>("Me", (_req, res, ctx) => {
@@ -41,49 +29,11 @@ export const handlers = [
     );
   }),
 
-  graphql.query<CategoriesQuery, CategoriesQueryVariables>(
-    "Categories",
-    (_req, res, ctx) => {
-      return res(
-        ctx.data({
-          categories,
-        })
-      );
-    }
-  ),
-
-  graphql.mutation<RemoveCategoryMutation, RemoveCategoryMutationVariables>(
-    "RemoveCategory",
-    (req, res, ctx) => {
-      const { removeCategoryId } = req.variables;
-      categories = categories.filter(({ id }) => id !== removeCategoryId);
-
-      return res(
-        ctx.data({
-          __typename: "Mutation",
-          removeCategory: true,
-        })
-      );
-    }
-  ),
-
-  graphql.mutation<CreateCategoryMutation, CreateCategoryMutationVariables>(
-    "CreateCategory",
-    (req, res, ctx) => {
-      const {
-        createCategoryInput: { name },
-      } = req.variables;
-      const newCategory: Category = {
-        __typename: "Category",
-        id: "category-3",
-        name,
-      };
-      categories.push(newCategory);
-      console.log("new categories for push: ", categories);
-
-      return res(
-        ctx.data({ __typename: "Mutation", createCategory: { name } })
-      );
-    }
+  graphql.query<BudgetsQuery, BudgetsQueryVariables>("Budgets", (req, res, ctx) =>
+    res(
+      ctx.data({
+        budgets,
+      })
+    )
   ),
 ];

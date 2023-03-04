@@ -19,7 +19,27 @@ export const GET_BUDGETS = graphql(`
 
 export default function Home() {
   const theme = useMantineTheme();
-  const { data: { budgets } = {}, error } = useQuery(GET_BUDGETS);
+  const { data, error, loading } = useQuery(GET_BUDGETS);
+  if (error) {
+    return (
+      <Center>
+        <Title>
+          {error.name} - {error.message}
+        </Title>
+      </Center>
+    );
+  }
+
+  if (loading || !data) {
+    return (
+      <Center>
+        <Title>Loading</Title>
+      </Center>
+    );
+  }
+
+  const { budgets } = data;
+
   return (
     <>
       <Head>
@@ -29,28 +49,19 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <>
-          <Center>
-            {error && (
-              <Text>
-                {error.name}: {error.message}
-              </Text>
-            )}
-          </Center>
-          <SimpleGrid cols={3} w="70%" mt="lg" mx="auto">
-            {budgets &&
-              budgets.map(({ id, name, description, maxAmount }) => (
-                <Card key={id} mih={140} py="xl" component={Link} href={`/budget/${id}`}>
-                  <Card.Section inheritPadding>
-                    <Text align="center" weight="bold" fz="lg" color={theme.primaryColor}>
-                      {name} - {maxAmount}
-                    </Text>
-                  </Card.Section>
-                  <Card.Section inheritPadding>{description}</Card.Section>
-                </Card>
-              ))}
-          </SimpleGrid>
-        </>
+        <SimpleGrid cols={3} w="70%" mt="lg" mx="auto">
+          {budgets &&
+            budgets.map(({ id, name, description, maxAmount }) => (
+              <Card key={id} mih={140} py="xl" component={Link} href={`/budget/${id}`}>
+                <Card.Section inheritPadding>
+                  <Text align="center" weight="bold" fz="lg" color={theme.primaryColor}>
+                    {name} - {maxAmount}
+                  </Text>
+                </Card.Section>
+                <Card.Section inheritPadding>{description}</Card.Section>
+              </Card>
+            ))}
+        </SimpleGrid>
       </main>
     </>
   );
