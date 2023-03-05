@@ -1,5 +1,6 @@
 import { BudgetsQuery, BudgetsQueryVariables, MeQuery, MeQueryVariables } from "@/gql/graphql";
 import { graphql } from "msw";
+import { budgetHandler } from "./BudgetQuery";
 
 export const budgets: BudgetsQuery["budgets"] = [
   {
@@ -36,4 +37,5 @@ export const handlers = [
       })
     )
   ),
+  budgetHandler,
 ];

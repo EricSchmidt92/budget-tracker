@@ -77,7 +77,7 @@ const BudgetPage: NextPage = () => {
   }
 
   const {
-    budget: { id, currentAmount, maxAmount, name, categories },
+    budget: { id, currentAmount, maxAmount, name, categories, description },
   } = data;
 
   const unformattedMaxAmount = accounting.unformat(maxAmount);
@@ -152,6 +152,7 @@ const BudgetPage: NextPage = () => {
             </Button>
           </Group>
         </Group>
+        <Text>{description}</Text>
 
         {isCategoryMaxError && (
           <Alert

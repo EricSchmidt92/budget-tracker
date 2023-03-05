@@ -1,5 +1,4 @@
 import "@testing-library/jest-dom/extend-expect";
-import { resetCategories } from "./src/mocks/handlers";
 import { server } from "./src/mocks/server";
 import { mockClient } from "./utils/test-utils";
 
@@ -23,7 +22,6 @@ jest.mock("next/router", () => ({
 
 beforeEach(() => {
   mockClient.clearStore();
-  resetCategories();
 });
 
 beforeAll(() => {
